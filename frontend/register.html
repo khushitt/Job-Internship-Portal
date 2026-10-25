@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account | CareerConnect</title>
+
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <header class="auth-navbar">
+        <a href="index.html" class="auth-logo">CareerConnect</a>
+        <a href="index.html" class="auth-home-link">← Back to Home</a>
+    </header>
+
+    <!-- Registration Form -->
+    <main class="auth-page">
+        <section class="auth-card">
+
+            <h1 class="auth-heading">Create Your Account</h1>
+
+            <p class="auth-subtitle">
+                Join CareerConnect and take the next step in your career.
+            </p>
+
+            <div id="authMessage" class="auth-message" role="alert"></div>
+
+            <form id="registerForm" class="auth-form">
+
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        placeholder="Enter your full name"
+                        autocomplete="name"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="you@example.com"
+                        autocomplete="email"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Create a password"
+                        autocomplete="new-password"
+                        minlength="8"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="role">Register As</label>
+                    <select id="role" name="role" required>
+                        <option value="">Choose your role</option>
+                        <option value="student">Student</option>
+                        <option value="recruiter">Recruiter</option>
+                    </select>
+                </div>
+
+                <button type="submit" id="registerButton" class="auth-button">
+                    Create Account
+                </button>
+
+            </form>
+
+            <p class="auth-switch">
+                Already have an account?
+                <a href="login.html">Login here</a>
+            </p>
+
+        </section>
+    </main>
+
+    <footer class="auth-footer">
+        © 2026 CareerConnect. All rights reserved.
+    </footer>
+
+    <script>
+        const API_URL = "http://localhost:5000/api/auth/register";
+
+        const registerForm = document.getElementById("registerForm");
+        const registerButton = document.getElementById("registerButton");
+        const authMessage = document.getElementById("authMessage");
+
+        function showMessage(message, type) {
+            authMessage.textContent = message;
+            authMessage.className = "auth-message " + type;
+        }
+
+        registerForm.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const name = document.getElementById("name").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value;
+            const role = document.getElementById("role").value;
+
+            if (!name || !email || !password || !role) {
+                showMessage("Please fill in all fields.", "error");
+                return;
+            }
+
+            if (password.length < 8) {
+                showMessage(
+                    "Password must contain at least 8 characters.",
+                    "error"
+                );
+                return;
+            }
+
+            registerButton.disabled = true;
+            registerButton.textContent = "Creating Account...";
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        name,
+                        email,
+                        password,
+                        role
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.message || "Registration failed. Please try again."
+                    );
+                }
+
+                showMessage(
+                    data.message || "Account created successfully! Redirecting to login...",
+                    "success"
+                );
+
+                registerForm.reset();
+
+                setTimeout(function () {
+                    window.location.href = "login.html";
+                }, 1500);
+
+            } catch (error) {
+                if (error instanceof TypeError) {
+                    showMessage(
+                        "Cannot connect to the server. Make sure your backend is running on port 5000.",
+                        "error"
+                    );
+                } else {
+                    showMessage(error.message, "error");
+                }
+            } finally {
+                registerButton.disabled = false;
+                registerButton.textContent = "Create Account";
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,783 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Jobs | CareerConnect</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8f5ff;
+            color: #30234a;
+        }
+
+        header {
+            background: #6c43a5;
+            color: white;
+            padding: 22px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        header h1 {
+            font-size: 26px;
+        }
+
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            width: 86%;
+            max-width: 1200px;
+            margin: 35px auto;
+        }
+
+        .page-heading {
+            margin-bottom: 25px;
+        }
+
+        .page-heading h2 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .page-heading p {
+            color: #756786;
+            line-height: 1.6;
+        }
+
+        .search-box {
+            background: white;
+            padding: 22px;
+            border-radius: 14px;
+            box-shadow: 0 4px 18px rgba(75, 45, 115, 0.08);
+            margin-bottom: 28px;
+        }
+
+        .search-box label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .search-row input {
+            flex: 1;
+            min-width: 220px;
+            padding: 13px;
+            border: 1px solid #d9cbea;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .search-row input:focus {
+            border-color: #8054bd;
+            box-shadow: 0 0 0 3px #eee4ff;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .search-button {
+            background: #6c43a5;
+            color: white;
+        }
+
+        .search-button:hover {
+            background: #543184;
+        }
+
+        .reset-button {
+            background: #eee5fa;
+            color: #58358a;
+        }
+
+        .reset-button:hover {
+            background: #e2d3f6;
+        }
+
+        .results-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        #jobsCount {
+            color: #756786;
+            font-size: 14px;
+        }
+
+        #jobsList {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 22px;
+        }
+
+        .job-card {
+            background: white;
+            border: 1px solid #eee5fa;
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 5px 18px rgba(75, 45, 115, 0.06);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .job-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 9px 24px rgba(75, 45, 115, 0.12);
+        }
+
+        .job-card h3 {
+            font-size: 21px;
+            color: #543184;
+            overflow-wrap: anywhere;
+        }
+
+        .company-name {
+            font-weight: bold;
+            color: #49365f;
+        }
+
+        .job-detail {
+            color: #756786;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .job-description {
+            line-height: 1.6;
+            color: #51445f;
+            overflow-wrap: anywhere;
+        }
+
+        .job-tag {
+            display: inline-block;
+            width: fit-content;
+            background: #f0e7ff;
+            color: #603b94;
+            padding: 6px 11px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .skills {
+            line-height: 1.7;
+            font-size: 14px;
+            color: #51445f;
+            overflow-wrap: anywhere;
+        }
+
+        .salary {
+            font-weight: bold;
+            color: #34754c;
+        }
+
+        .apply-button {
+            width: 100%;
+            margin-top: auto;
+            background: #8054bd;
+            color: white;
+        }
+
+        .apply-button:hover:not(:disabled) {
+            background: #603b94;
+        }
+
+        .apply-button:disabled {
+            background: #d9c9ef;
+            color: #58358a;
+            cursor: not-allowed;
+            opacity: 1;
+        }
+
+        .apply-button.already-applied {
+            background: #e7def3;
+            color: #58358a;
+        }
+
+        .empty-state {
+            background: white;
+            padding: 35px 20px;
+            text-align: center;
+            border-radius: 12px;
+            color: #756786;
+            line-height: 1.8;
+            grid-column: 1 / -1;
+        }
+
+        #pageMessage {
+            margin-bottom: 20px;
+            padding: 13px 16px;
+            border-radius: 8px;
+            line-height: 1.5;
+            display: none;
+            overflow-wrap: anywhere;
+        }
+
+        #pageMessage.success {
+            display: block;
+            background: #e5f7eb;
+            color: #23633a;
+        }
+
+        #pageMessage.error {
+            display: block;
+            background: #ffe8e8;
+            color: #9b2525;
+        }
+
+        #pageMessage.info {
+            display: block;
+            background: #eee5fa;
+            color: #58358a;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            margin-top: 45px;
+            background: #eee5fa;
+            color: #756786;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                padding: 20px 6%;
+            }
+
+            .container {
+                width: 90%;
+            }
+
+            .page-heading h2 {
+                font-size: 27px;
+            }
+
+            .search-row button {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>CareerConnect</h1>
+
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="jobs.html">Explore Jobs</a>
+            <a href="student-dashboard.html">Dashboard</a>
+            <a href="login.html">Login</a>
+        </nav>
+    </header>
+
+    <main class="container">
+
+        <section class="page-heading">
+            <h2>Explore Jobs & Internships</h2>
+            <p>
+                Find opportunities that match your skills, interests, and career goals.
+            </p>
+        </section>
+
+        <section class="search-box">
+            <form id="searchForm">
+                <label for="searchInput">Search jobs by title, company, skills, location, or job type</label>
+
+                <div class="search-row">
+                    <input
+                        type="search"
+                        id="searchInput"
+                        placeholder="Example: Node.js, Jaipur, Developer..."
+                        autocomplete="off"
+                    >
+
+                    <button type="submit" class="search-button">
+                        Search
+                    </button>
+
+                    <button type="button" id="resetButton" class="reset-button">
+                        Reset
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <div id="pageMessage" role="status" aria-live="polite"></div>
+
+        <section>
+            <div class="results-heading">
+                <h2>Available Opportunities</h2>
+                <p id="jobsCount">Loading jobs...</p>
+            </div>
+
+            <div id="jobsList"></div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>© 2026 CareerConnect | Connecting Talent with Opportunities</p>
+    </footer>
+
+    <script>
+        const API_URL = "http://localhost:5000/api/jobs";
+        const APPLICATION_API_URL =
+            "http://localhost:5000/api/applications";
+
+        const jobsList = document.getElementById("jobsList");
+        const jobsCount = document.getElementById("jobsCount");
+        const pageMessage = document.getElementById("pageMessage");
+        const searchForm = document.getElementById("searchForm");
+        const searchInput = document.getElementById("searchInput");
+        const resetButton = document.getElementById("resetButton");
+
+        let allJobs = [];
+        let appliedJobIds = new Set();
+
+        function showMessage(message, type) {
+            pageMessage.textContent = message;
+            pageMessage.className = type;
+        }
+
+        function clearMessage() {
+            pageMessage.textContent = "";
+            pageMessage.className = "";
+        }
+
+        function makeText(tag, className, value) {
+            const element = document.createElement(tag);
+
+            if (className) {
+                element.className = className;
+            }
+
+            element.textContent =
+                value === null || value === undefined || value === ""
+                    ? "Not specified"
+                    : String(value);
+
+            return element;
+        }
+
+        function getJobArray(data) {
+            if (Array.isArray(data)) {
+                return data;
+            }
+
+            if (data && Array.isArray(data.jobs)) {
+                return data.jobs;
+            }
+
+            if (data && Array.isArray(data.data)) {
+                return data.data;
+            }
+
+            return [];
+        }
+
+        function formatSalary(job) {
+            const salary = job.salary;
+
+            if (salary !== null && salary !== undefined && salary !== "") {
+                return String(salary);
+            }
+
+            if (
+                job.salary_min !== undefined &&
+                job.salary_max !== undefined
+            ) {
+                return job.salary_min + " - " + job.salary_max;
+            }
+
+            return "Not specified";
+        }
+
+        function getJobType(job) {
+            return job.job_type || job.type || "Not specified";
+        }
+
+        function getCompany(job) {
+            return job.company_name || job.company || "Company not specified";
+        }
+
+        function getSkills(job) {
+            const skills = job.skills_required || job.required_skills;
+
+            if (Array.isArray(skills)) {
+                return skills.join(", ");
+            }
+
+            return skills || "Not specified";
+        }
+
+        function renderJobs(jobs) {
+            jobsList.replaceChildren();
+
+            jobsCount.textContent =
+                jobs.length +
+                (jobs.length === 1 ? " job found" : " jobs found");
+
+            if (jobs.length === 0) {
+                const emptyState = document.createElement("div");
+                emptyState.className = "empty-state";
+                emptyState.textContent =
+                    "No jobs found. Try another search keyword.";
+                jobsList.appendChild(emptyState);
+                return;
+            }
+
+            jobs.forEach(function (job) {
+                const card = document.createElement("article");
+                card.className = "job-card";
+
+                const title = makeText(
+                    "h3",
+                    "",
+                    job.title || job.job_title || "Untitled Position"
+                );
+
+                const company = makeText(
+                    "p",
+                    "company-name",
+                    getCompany(job)
+                );
+
+                const location = makeText(
+                    "p",
+                    "job-detail",
+                    "Location: " + (job.location || "Not specified")
+                );
+
+                const jobType = makeText(
+                    "span",
+                    "job-tag",
+                    getJobType(job)
+                );
+
+                const skills = makeText(
+                    "p",
+                    "skills",
+                    "Skills: " + getSkills(job)
+                );
+
+                const salary = makeText(
+                    "p",
+                    "salary",
+                    "Salary: " + formatSalary(job)
+                );
+
+                card.appendChild(title);
+                card.appendChild(company);
+                card.appendChild(location);
+                card.appendChild(jobType);
+                card.appendChild(skills);
+                card.appendChild(salary);
+
+                if (job.description) {
+                    const description = makeText(
+                        "p",
+                        "job-description",
+                        job.description
+                    );
+
+                    card.appendChild(description);
+                }
+
+                const jobId = Number(job.job_id || job.id);
+
+                const applyButton = makeText(
+                    "button",
+                    "apply-button",
+                    "Apply Now"
+                );
+
+                applyButton.type = "button";
+
+                if (appliedJobIds.has(jobId)) {
+                    applyButton.textContent = "Already Applied";
+                    applyButton.disabled = true;
+                    applyButton.classList.add("already-applied");
+                } else {
+                    applyButton.addEventListener("click", function () {
+                        applyForJob(jobId, applyButton);
+                    });
+                }
+
+                card.appendChild(applyButton);
+                jobsList.appendChild(card);
+            });
+        }
+
+        async function loadMyApplications() {
+            const token = localStorage.getItem("token");
+            const role = localStorage.getItem("role");
+
+            appliedJobIds = new Set();
+
+            if (!token || role !== "student") {
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    APPLICATION_API_URL + "/my-applications",
+                    {
+                        method: "GET",
+                        headers: {
+                            "Authorization": "Bearer " + token
+                        }
+                    }
+                );
+
+                if (!response.ok) {
+                    console.error(
+                        "Could not retrieve applications. HTTP status:",
+                        response.status
+                    );
+                    return;
+                }
+
+                const data = await response.json();
+
+                const applications = Array.isArray(data.applications)
+                    ? data.applications
+                    : [];
+
+                appliedJobIds = new Set(
+                    applications
+                        .map(function (application) {
+                            return Number(application.job_id);
+                        })
+                        .filter(function (jobId) {
+                            return Number.isFinite(jobId) && jobId > 0;
+                        })
+                );
+            } catch (error) {
+                console.error(
+                    "Could not load student applications:",
+                    error
+                );
+            }
+        }
+
+        async function loadJobs() {
+            jobsCount.textContent = "Loading jobs...";
+            jobsList.replaceChildren();
+            clearMessage();
+
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.message || "Unable to load jobs."
+                    );
+                }
+
+                allJobs = getJobArray(data);
+
+                // Load the student's application history before rendering.
+                await loadMyApplications();
+
+                renderJobs(allJobs);
+            } catch (error) {
+                console.error("Error loading jobs:", error);
+
+                jobsCount.textContent = "Jobs could not be loaded.";
+
+                showMessage(
+                    "Could not load jobs from the backend. Check that your server is running and that GET /api/jobs works.",
+                    "error"
+                );
+            }
+        }
+
+        searchForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const term = searchInput.value.trim().toLowerCase();
+
+            if (!term) {
+                renderJobs(allJobs);
+                return;
+            }
+
+            const filteredJobs = allJobs.filter(function (job) {
+                const searchableText = [
+                    job.title,
+                    job.job_title,
+                    job.company_name,
+                    job.company,
+                    job.location,
+                    job.job_type,
+                    job.type,
+                    job.skills_required,
+                    job.required_skills,
+                    job.description
+                ]
+                    .filter(Boolean)
+                    .map(function (value) {
+                        return Array.isArray(value)
+                            ? value.join(" ")
+                            : String(value);
+                    })
+                    .join(" ")
+                    .toLowerCase();
+
+                return searchableText.includes(term);
+            });
+
+            renderJobs(filteredJobs);
+        });
+
+        resetButton.addEventListener("click", function () {
+            searchInput.value = "";
+            clearMessage();
+            renderJobs(allJobs);
+        });
+
+        async function applyForJob(jobId, button) {
+            const token = localStorage.getItem("token");
+            const role = localStorage.getItem("role");
+
+            if (!token) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            if (role !== "student") {
+                showMessage(
+                    "Please log in with a student account to apply.",
+                    "error"
+                );
+                return;
+            }
+
+            if (appliedJobIds.has(Number(jobId))) {
+                button.textContent = "Already Applied";
+                button.disabled = true;
+                button.classList.add("already-applied");
+                return;
+            }
+
+            button.disabled = true;
+            button.textContent = "Submitting...";
+
+            try {
+                const response = await fetch(
+                    APPLICATION_API_URL + "/apply",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": "Bearer " + token
+                        },
+                        body: JSON.stringify({
+                            job_id: jobId
+                        })
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    // If the backend detects a duplicate, update the UI.
+                    if (
+                        response.status === 409 ||
+                        (
+                            typeof data.message === "string" &&
+                            data.message.toLowerCase().includes("already applied")
+                        )
+                    ) {
+                        appliedJobIds.add(Number(jobId));
+                        button.textContent = "Already Applied";
+                        button.classList.add("already-applied");
+                        button.disabled = true;
+
+                        showMessage(
+                            "You have already applied for this job.",
+                            "info"
+                        );
+
+                        return;
+                    }
+
+                    throw new Error(
+                        data.message || "Application failed."
+                    );
+                }
+
+                appliedJobIds.add(Number(jobId));
+
+                button.textContent = "Already Applied";
+                button.classList.add("already-applied");
+                button.disabled = true;
+
+                showMessage(
+                    data.message || "Application submitted successfully!",
+                    "success"
+                );
+
+            } catch (error) {
+                console.error("Application error:", error);
+
+                showMessage(error.message, "error");
+
+                button.disabled = false;
+                button.textContent = "Apply Now";
+            }
+        }
+
+        loadJobs();
+    </script>
+
+</body>
+</html>

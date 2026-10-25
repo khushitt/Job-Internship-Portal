@@ -1,0 +1,979 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Dashboard | CareerConnect</title>
+
+    <link rel="stylesheet" href="css/auth.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f8f5ff;
+            color: #30204f;
+        }
+
+        .dashboard-navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 7%;
+            background: white;
+            box-shadow: 0 3px 15px rgba(60, 30, 100, 0.08);
+        }
+
+        .brand {
+            color: #7c3aed;
+            font-size: 25px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .navbar-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .navbar-links a {
+            color: #6d28a8;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            border: none;
+            border-radius: 8px;
+            padding: 11px 20px;
+            background: #7c3aed;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: #5b21b6;
+        }
+
+        .dashboard-content {
+            max-width: 1100px;
+            margin: 45px auto;
+            padding: 0 24px;
+        }
+
+        .welcome-section {
+            padding: 35px;
+            border-radius: 18px;
+            background: linear-gradient(120deg, #ede9fe, #f5eaff);
+        }
+
+        .welcome-section h1 {
+            margin: 0 0 12px;
+            font-size: 32px;
+            color: #4c1d95;
+            overflow-wrap: anywhere;
+        }
+
+        .welcome-section p {
+            color: #655778;
+            line-height: 1.7;
+        }
+
+        .section-title {
+            margin: 35px 0 20px;
+            font-size: 23px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 22px;
+        }
+
+        .dashboard-card {
+            padding: 25px;
+            background: white;
+            border: 1px solid #eee5ff;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(60, 30, 100, 0.05);
+        }
+
+        .dashboard-card .icon {
+            font-size: 30px;
+        }
+
+        .dashboard-card h3 {
+            margin-bottom: 10px;
+        }
+
+        .dashboard-card p {
+            min-height: 48px;
+            color: #756987;
+            line-height: 1.6;
+        }
+
+        .stat-number {
+            color: #7c3aed;
+            font-size: 30px;
+            font-weight: bold;
+            margin: 12px 0;
+        }
+
+        .card-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: #7c3aed;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .card-link:hover {
+            text-decoration: underline;
+        }
+
+        .content-panel {
+            margin-top: 28px;
+            padding: 28px;
+            background: white;
+            border: 1px solid #eee5ff;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(60, 30, 100, 0.05);
+            scroll-margin-top: 25px;
+        }
+
+        .content-panel h2 {
+            margin-top: 0;
+            color: #4c1d95;
+        }
+
+        .panel-description {
+            color: #756987;
+            line-height: 1.6;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+            margin-top: 22px;
+        }
+
+        .profile-field {
+            padding: 15px;
+            border-radius: 10px;
+            background: #faf7ff;
+            border: 1px solid #eee5ff;
+            overflow-wrap: anywhere;
+        }
+
+        .profile-field strong {
+            display: block;
+            color: #756987;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .profile-field span {
+            color: #30204f;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .applications-list {
+            display: grid;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .application-card {
+            padding: 20px;
+            border: 1px solid #eee5ff;
+            border-radius: 12px;
+            background: #fdfbff;
+        }
+
+        .application-card h3 {
+            color: #4c1d95;
+            margin: 0 0 8px;
+            overflow-wrap: anywhere;
+        }
+
+        .application-card p {
+            color: #756987;
+            line-height: 1.6;
+            margin: 7px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 7px 12px;
+            border-radius: 20px;
+            background: #eee5fa;
+            color: #58358a;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-shortlisted {
+            background: #dff5e5;
+            color: #23633a;
+        }
+
+        .status-accepted {
+            background: #dff5e5;
+            color: #23633a;
+        }
+
+        .status-rejected {
+            background: #ffe5e5;
+            color: #9b2525;
+        }
+
+        .empty-state {
+            padding: 22px;
+            text-align: center;
+            border-radius: 10px;
+            background: #faf7ff;
+            color: #756987;
+            line-height: 1.7;
+        }
+
+        .message {
+            display: none;
+            margin: 20px 0;
+            padding: 14px 16px;
+            border-radius: 9px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .message.error {
+            display: block;
+            background: #ffe8e8;
+            color: #9b2525;
+        }
+
+        .message.success {
+            display: block;
+            background: #e5f7eb;
+            color: #23633a;
+        }
+
+        .message.info {
+            display: block;
+            background: #eee5fa;
+            color: #58358a;
+        }
+
+        .refresh-btn {
+            border: none;
+            border-radius: 8px;
+            padding: 10px 15px;
+            background: #eee5fa;
+            color: #58358a;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .refresh-btn:hover {
+            background: #e2d3f6;
+        }
+
+        .panel-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+
+        .edit-profile-form {
+            display: none;
+            margin-top: 22px;
+            padding: 22px;
+            border: 1px solid #e5d5ff;
+            border-radius: 12px;
+            background: #fcfaff;
+        }
+
+        .edit-profile-form.visible { display: block; }
+
+        .edit-form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .edit-form-field { display: flex; flex-direction: column; gap: 7px; }
+        .edit-form-field.full-width { grid-column: 1 / -1; }
+        .edit-form-field label { font-size: 14px; font-weight: bold; color: #58358a; }
+        .edit-form-field input, .edit-form-field textarea {
+            width: 100%; padding: 12px; border: 1px solid #d9c7f5;
+            border-radius: 8px; font: inherit; color: #30204f; background: white;
+        }
+        .edit-form-field input:focus, .edit-form-field textarea:focus {
+            outline: 2px solid #c4b5fd; border-color: #7c3aed;
+        }
+        .edit-form-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+        .save-profile-btn {
+            border: none; border-radius: 8px; padding: 11px 18px;
+            background: #7c3aed; color: white; font-weight: bold; cursor: pointer;
+        }
+        .save-profile-btn:hover { background: #5b21b6; }
+        .save-profile-btn:disabled { opacity: .65; cursor: wait; }
+        .cancel-edit-btn {
+            border: 1px solid #d9c7f5; border-radius: 8px; padding: 10px 16px;
+            background: white; color: #58358a; font-weight: bold; cursor: pointer;
+        }
+        @media (max-width: 600px) {
+            .edit-form-grid { grid-template-columns: 1fr; }
+            .edit-form-field.full-width { grid-column: auto; }
+        }
+
+        .dashboard-footer {
+            margin-top: 60px;
+            padding: 25px;
+            text-align: center;
+            color: #766a85;
+        }
+
+        @media (max-width: 800px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .navbar-links {
+                gap: 12px;
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .dashboard-navbar {
+                padding: 18px 5%;
+                gap: 15px;
+                flex-wrap: wrap;
+            }
+
+            .dashboard-content {
+                margin-top: 25px;
+                padding: 0 16px;
+            }
+
+            .welcome-section {
+                padding: 25px;
+            }
+
+            .welcome-section h1 {
+                font-size: 26px;
+            }
+
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content-panel {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="dashboard-navbar">
+        <a href="index.html" class="brand">CareerConnect</a>
+
+        <nav class="navbar-links">
+            <a href="jobs.html">Explore Jobs</a>
+            <button type="button" class="logout-btn" id="logoutButton">
+                Logout
+            </button>
+        </nav>
+    </header>
+
+    <main class="dashboard-content">
+
+        <section class="welcome-section">
+            <h1 id="welcomeTitle">Welcome to Your Dashboard!</h1>
+
+            <p>
+                Your career journey starts here. Explore opportunities,
+                manage your applications, and take the next step toward
+                your dream job.
+            </p>
+        </section>
+
+        <div id="dashboardMessage" class="message" role="status"
+             aria-live="polite"></div>
+
+        <h2 class="section-title">Your Career Workspace</h2>
+
+        <section class="dashboard-grid">
+
+            <article class="dashboard-card">
+                <div class="icon">💼</div>
+                <h3>Find Jobs & Internships</h3>
+                <p>
+                    Explore opportunities that match your skills and interests.
+                </p>
+                <a href="jobs.html" class="card-link">
+                    Explore opportunities →
+                </a>
+            </article>
+
+            <article class="dashboard-card">
+                <div class="icon">📄</div>
+                <h3>My Applications</h3>
+                <div class="stat-number" id="applicationCount">—</div>
+                <p>Track the jobs and internships you have applied for.</p>
+                <a href="#applicationsSection" class="card-link"
+                   id="applicationsLink">
+                    View applications →
+                </a>
+            </article>
+
+            <article class="dashboard-card">
+                <div class="icon">👤</div>
+                <h3>My Profile</h3>
+                <p id="profileSummary">
+                    View your professional and educational information.
+                </p>
+                <a href="#profileSection" class="card-link" id="profileLink">
+                    View profile →
+                </a>
+            </article>
+
+        </section>
+
+        <section class="content-panel" id="applicationsSection">
+            <div class="panel-heading">
+                <h2>My Applications</h2>
+                <button type="button" class="refresh-btn"
+                        id="refreshApplicationsButton">
+                    Refresh
+                </button>
+            </div>
+
+            <p class="panel-description">
+                Check your submitted applications and their latest statuses.
+            </p>
+
+            <div id="applicationsList" class="applications-list">
+                <div class="empty-state">Loading your applications...</div>
+            </div>
+        </section>
+
+        <section class="content-panel" id="profileSection">
+            <div class="panel-heading">
+                <h2>My Student Profile</h2>
+                <div class="panel-heading">
+                    <button type="button" class="refresh-btn" id="editProfileButton">
+                        ✏️ Edit Profile
+                    </button>
+                    <button type="button" class="refresh-btn" id="refreshProfileButton">
+                        Refresh
+                    </button>
+                </div>
+            </div>
+
+            <p class="panel-description">
+                Your profile information retrieved from CareerConnect.
+            </p>
+
+            <div id="profileDetails" class="profile-grid">
+                <div class="empty-state">Loading your profile...</div>
+            </div>
+
+            <form id="editProfileForm" class="edit-profile-form">
+                <h3>Edit your information</h3>
+                <p class="panel-description">Update your educational and professional details. Your name and email are shown from your account and aren't editable here.</p>
+                <div class="edit-form-grid">
+                    <div class="edit-form-field">
+                        <label for="editPhone">Phone</label>
+                        <input id="editPhone" name="phone" type="tel" maxlength="30" autocomplete="tel">
+                    </div>
+                    <div class="edit-form-field">
+                        <label for="editCollege">College</label>
+                        <input id="editCollege" name="college" type="text" maxlength="255" required>
+                    </div>
+                    <div class="edit-form-field">
+                        <label for="editDegree">Degree</label>
+                        <input id="editDegree" name="degree" type="text" maxlength="255" required>
+                    </div>
+                    <div class="edit-form-field">
+                        <label for="editResume">Resume filename or link</label>
+                        <input id="editResume" name="resume" type="text" maxlength="500" placeholder="e.g. my-resume.pdf">
+                    </div>
+                    <div class="edit-form-field full-width">
+                        <label for="editSkills">Skills</label>
+                        <textarea id="editSkills" name="skills" rows="3" maxlength="2000" placeholder="e.g. HTML, CSS, JavaScript"></textarea>
+                    </div>
+                </div>
+                <div class="edit-form-actions">
+                    <button type="submit" class="save-profile-btn" id="saveProfileButton">Save Changes</button>
+                    <button type="button" class="cancel-edit-btn" id="cancelEditButton">Cancel</button>
+                </div>
+            </form>
+        </section>
+
+        <footer class="dashboard-footer">
+            © 2026 CareerConnect. Connecting talent with opportunities.
+        </footer>
+
+    </main>
+
+    <script>
+        const API_BASE_URL = "http://localhost:5000/api";
+
+        const token = localStorage.getItem("token");
+        const role = localStorage.getItem("role");
+
+        const welcomeTitle = document.getElementById("welcomeTitle");
+        const dashboardMessage = document.getElementById("dashboardMessage");
+        const applicationCount = document.getElementById("applicationCount");
+        const applicationsList = document.getElementById("applicationsList");
+        const profileDetails = document.getElementById("profileDetails");
+        const profileSummary = document.getElementById("profileSummary");
+
+        let myApplications = [];
+        let currentStudentProfile = null;
+
+        // Require a student login before loading private information.
+        if (!token) {
+            window.location.replace("login.html");
+        } else if (role !== "student") {
+            window.location.replace("index.html");
+        }
+
+        function showMessage(message, type) {
+            dashboardMessage.textContent = message;
+            dashboardMessage.className = "message " + type;
+        }
+
+        function clearMessage() {
+            dashboardMessage.textContent = "";
+            dashboardMessage.className = "message";
+        }
+
+        function makeElement(tag, className, text) {
+            const element = document.createElement(tag);
+
+            if (className) {
+                element.className = className;
+            }
+
+            if (text !== undefined && text !== null && text !== "") {
+                element.textContent = String(text);
+            }
+
+            return element;
+        }
+
+        function formatValue(value) {
+            if (value === undefined || value === null || value === "") {
+                return "Not provided";
+            }
+
+            if (Array.isArray(value)) {
+                return value.length ? value.join(", ") : "Not provided";
+            }
+
+            return String(value);
+        }
+
+        function formatDate(value) {
+            if (!value) {
+                return "Not available";
+            }
+
+            const date = new Date(value);
+
+            if (Number.isNaN(date.getTime())) {
+                return String(value);
+            }
+
+            return date.toLocaleDateString("en-IN", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            });
+        }
+
+        function getStatus(application) {
+            return (
+                application.application_status ||
+                application.status ||
+                "Pending"
+            );
+        }
+
+        function getStatusClass(status) {
+            const normalized = String(status).toLowerCase();
+
+            if (normalized.includes("shortlist")) {
+                return "status-badge status-shortlisted";
+            }
+
+            if (normalized.includes("accept") || normalized === "selected") {
+                return "status-badge status-accepted";
+            }
+
+            if (normalized.includes("reject")) {
+                return "status-badge status-rejected";
+            }
+
+            if (normalized.includes("pending") || normalized.includes("review")) {
+                return "status-badge status-pending";
+            }
+
+            return "status-badge";
+        }
+
+        function getApplicationsArray(data) {
+            if (Array.isArray(data)) {
+                return data;
+            }
+
+            if (data && Array.isArray(data.applications)) {
+                return data.applications;
+            }
+
+            if (data && Array.isArray(data.data)) {
+                return data.data;
+            }
+
+            return [];
+        }
+
+        // Display a profile field safely using textContent.
+        function addProfileField(label, value) {
+            const field = makeElement("div", "profile-field");
+            const heading = makeElement("strong", "", label);
+            const content = makeElement("span", "", formatValue(value));
+
+            field.appendChild(heading);
+            field.appendChild(content);
+            profileDetails.appendChild(field);
+        }
+
+        async function loadStudentProfile() {
+            profileDetails.replaceChildren();
+
+            try {
+                const response = await fetch(
+                    API_BASE_URL + "/student/profile",
+                    {
+                        method: "GET",
+                        headers: {
+                            "Authorization": "Bearer " + token
+                        }
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.message || "Could not load student profile."
+                    );
+                }
+
+                const profile = data.profile || data.student || data.data;
+
+                if (!profile) {
+                    currentStudentProfile = null;
+                    profileDetails.appendChild(
+                        makeElement(
+                            "div",
+                            "empty-state",
+                            "Your profile has not been created yet. Please complete your student profile."
+                        )
+                    );
+
+                    profileSummary.textContent =
+                        "Your student profile is not available yet.";
+
+                    return;
+                }
+
+                currentStudentProfile = profile;
+                const savedName = localStorage.getItem("name");
+                const displayName =
+                    profile.name ||
+                    profile.full_name ||
+                    savedName ||
+                    "Student";
+
+                welcomeTitle.textContent = "Welcome, " + displayName + "!";
+
+                profileSummary.textContent =
+                    profile.college || profile.degree
+                        ? [profile.degree, profile.college]
+                              .filter(Boolean)
+                              .join(" • ")
+                        : "View your professional and educational information.";
+
+                addProfileField("Full Name", displayName);
+                addProfileField(
+                    "Email",
+                    profile.email || localStorage.getItem("email")
+                );
+                addProfileField("Phone", profile.phone);
+                addProfileField("College", profile.college);
+                addProfileField("Degree", profile.degree);
+                addProfileField("Skills", profile.skills);
+                addProfileField("Resume", profile.resume);
+                populateEditProfileForm(profile);
+
+            } catch (error) {
+                console.error("Profile loading error:", error);
+
+                profileDetails.appendChild(
+                    makeElement(
+                        "div",
+                        "empty-state",
+                        "Unable to load your profile. Check the backend server and GET /api/student/profile."
+                    )
+                );
+
+                profileSummary.textContent =
+                    "Your profile information could not be loaded.";
+            }
+        }
+
+        function populateEditProfileForm(profile) {
+            document.getElementById("editPhone").value = profile.phone || "";
+            document.getElementById("editCollege").value = profile.college || "";
+            document.getElementById("editDegree").value = profile.degree || "";
+            document.getElementById("editSkills").value = Array.isArray(profile.skills)
+                ? profile.skills.join(", ")
+                : (profile.skills || "");
+            document.getElementById("editResume").value = profile.resume || "";
+        }
+
+        document.getElementById("editProfileButton").addEventListener("click", function () {
+            if (!currentStudentProfile) {
+                showMessage("Your profile must load before you can edit it.", "error");
+                return;
+            }
+            populateEditProfileForm(currentStudentProfile);
+            document.getElementById("editProfileForm").classList.add("visible");
+            document.getElementById("editProfileForm").scrollIntoView({ behavior: "smooth", block: "nearest" });
+            clearMessage();
+        });
+
+        document.getElementById("cancelEditButton").addEventListener("click", function () {
+            document.getElementById("editProfileForm").classList.remove("visible");
+            if (currentStudentProfile) populateEditProfileForm(currentStudentProfile);
+            clearMessage();
+        });
+
+        document.getElementById("editProfileForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+            const saveButton = document.getElementById("saveProfileButton");
+            const originalButtonText = saveButton.textContent;
+            saveButton.disabled = true;
+            saveButton.textContent = "Saving...";
+            clearMessage();
+
+            const payload = {
+                phone: document.getElementById("editPhone").value.trim(),
+                college: document.getElementById("editCollege").value.trim(),
+                degree: document.getElementById("editDegree").value.trim(),
+                skills: document.getElementById("editSkills").value.trim(),
+                resume: document.getElementById("editResume").value.trim()
+            };
+
+            try {
+                const response = await fetch(API_BASE_URL + "/student/profile", {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + token
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.message || "Could not update your profile.");
+                }
+
+                await loadStudentProfile();
+                document.getElementById("editProfileForm").classList.remove("visible");
+                showMessage(data.message || "Profile updated successfully!", "success");
+            } catch (error) {
+                console.error("Profile update error:", error);
+                showMessage(error.message || "Unable to save your profile. Please try again.", "error");
+            } finally {
+                saveButton.disabled = false;
+                saveButton.textContent = originalButtonText;
+            }
+        });
+
+        function renderApplications(applications) {
+            applicationsList.replaceChildren();
+
+            applicationCount.textContent = String(applications.length);
+
+            if (applications.length === 0) {
+                applicationsList.appendChild(
+                    makeElement(
+                        "div",
+                        "empty-state",
+                        "You have not applied for any jobs yet. Explore jobs and internships to get started!"
+                    )
+                );
+
+                return;
+            }
+
+            applications.forEach(function (application) {
+                const card = makeElement("article", "application-card");
+
+                const title = makeElement(
+                    "h3",
+                    "",
+                    application.title ||
+                    application.job_title ||
+                    "Job #" + formatValue(application.job_id)
+                );
+
+                const company = makeElement(
+                    "p",
+                    "",
+                    "Company: " +
+                    formatValue(
+                        application.company_name || application.company
+                    )
+                );
+
+                const location = makeElement(
+                    "p",
+                    "",
+                    "Location: " + formatValue(application.location)
+                );
+
+                const appliedDate = makeElement(
+                    "p",
+                    "",
+                    "Applied on: " + formatDate(application.applied_at)
+                );
+
+                const status = getStatus(application);
+
+                const statusRow = makeElement("p", "");
+                statusRow.appendChild(
+                    makeElement("strong", "", "Application status: ")
+                );
+                statusRow.appendChild(
+                    makeElement("span", getStatusClass(status), status)
+                );
+
+                card.appendChild(title);
+                card.appendChild(company);
+                card.appendChild(location);
+                card.appendChild(appliedDate);
+                card.appendChild(statusRow);
+
+                applicationsList.appendChild(card);
+            });
+        }
+
+        async function loadMyApplications() {
+            applicationsList.replaceChildren();
+
+            applicationsList.appendChild(
+                makeElement("div", "empty-state", "Loading applications...")
+            );
+
+            try {
+                const response = await fetch(
+                    API_BASE_URL + "/applications/my-applications",
+                    {
+                        method: "GET",
+                        headers: {
+                            "Authorization": "Bearer " + token
+                        }
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.message || "Could not load applications."
+                    );
+                }
+
+                myApplications = getApplicationsArray(data);
+
+                renderApplications(myApplications);
+
+            } catch (error) {
+                console.error("Applications loading error:", error);
+
+                applicationCount.textContent = "—";
+
+                applicationsList.replaceChildren();
+
+                applicationsList.appendChild(
+                    makeElement(
+                        "div",
+                        "empty-state",
+                        "Unable to load applications. Check the backend server and GET /api/applications/my-applications."
+                    )
+                );
+            }
+        }
+
+        // Refresh the profile and application history.
+        document.getElementById("refreshApplicationsButton")
+            .addEventListener("click", async function () {
+                clearMessage();
+                await loadMyApplications();
+                showMessage("Application list refreshed.", "success");
+            });
+
+        document.getElementById("refreshProfileButton")
+            .addEventListener("click", async function () {
+                clearMessage();
+                await loadStudentProfile();
+                showMessage("Profile information refreshed.", "success");
+            });
+
+        // Logout and remove session-related local storage values.
+        document.getElementById("logoutButton")
+            .addEventListener("click", function () {
+                localStorage.removeItem("token");
+                localStorage.removeItem("role");
+                localStorage.removeItem("name");
+                localStorage.removeItem("email");
+
+                window.location.replace("login.html");
+            });
+
+        // Load dashboard information after verifying the session.
+        if (token && role === "student") {
+            loadStudentProfile();
+            loadMyApplications();
+        }
+    </script>
+
+</body>
+</html>

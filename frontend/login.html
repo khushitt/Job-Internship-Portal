@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login | CareerConnect</title>
+
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <header class="auth-navbar">
+        <a href="index.html" class="auth-logo">CareerConnect</a>
+        <a href="index.html" class="auth-home-link">← Back to Home</a>
+    </header>
+
+    <!-- Login Form -->
+    <main class="auth-page">
+        <section class="auth-card">
+
+            <h1 class="auth-heading">Welcome Back!</h1>
+
+            <p class="auth-subtitle">
+                Log in to discover opportunities and manage your career journey.
+            </p>
+
+            <div id="authMessage" class="auth-message" role="alert"></div>
+
+            <form id="loginForm" class="auth-form">
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="you@example.com"
+                        autocomplete="email"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
+                </div>
+
+                <button type="submit" id="loginButton" class="auth-button">
+                    Login
+                </button>
+
+            </form>
+
+            <p class="auth-switch">
+                Don't have an account?
+                <a href="register.html">Create an account</a>
+            </p>
+
+        </section>
+    </main>
+
+    <footer class="auth-footer">
+        © 2026 CareerConnect. All rights reserved.
+    </footer>
+
+    <script>
+        const API_URL = "http://localhost:5000/api/auth/login";
+
+        const loginForm = document.getElementById("loginForm");
+        const loginButton = document.getElementById("loginButton");
+        const authMessage = document.getElementById("authMessage");
+
+        function showMessage(message, type) {
+            authMessage.textContent = message;
+            authMessage.className = "auth-message " + type;
+        }
+
+        loginForm.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value;
+
+            loginButton.disabled = true;
+            loginButton.textContent = "Logging in...";
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        email,
+                        password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || "Login failed. Check your credentials.");
+                }
+
+                // Support common token response property names.
+                const token = data.token || data.accessToken || data.access_token;
+
+                if (!token) {
+                    throw new Error(
+                        "Login succeeded, but the server did not return a token. Check your backend response."
+                    );
+                }
+
+                // Store the token for authenticated API requests.
+                localStorage.setItem("token", token);
+
+                // Save the user's role for frontend navigation.
+                const user = data.user || data;
+                const role = user.role || data.role;
+
+                if (role) {
+                    localStorage.setItem("role", role);
+                }
+
+                showMessage("Login successful! Welcome to CareerConnect.", "success");
+
+                // Temporary destinations until we build the dashboards.
+                setTimeout(function () {
+                    if (role === "student") {
+                        window.location.href = "student-dashboard.html";
+                    } else if (role === "recruiter") {
+                        window.location.href = "recruiter-dashboard.html";
+                    } else if (role === "admin") {
+                        window.location.href = "index.html";
+                    } else {
+                        showMessage(
+                            "Login succeeded, but the user role was not returned. Please check your backend login response.",
+                            "error"
+                        );
+                    }
+                }, 1000);
+
+            } catch (error) {
+                if (error instanceof TypeError) {
+                    showMessage(
+                        "Cannot connect to the server. Make sure your backend is running on port 5000.",
+                        "error"
+                    );
+                } else {
+                    showMessage(error.message, "error");
+                }
+            } finally {
+                loginButton.disabled = false;
+                loginButton.textContent = "Login";
+            }
+        });
+    </script>
+
+</body>
+</html>
