@@ -1,4 +1,5 @@
 const db = require("../config/db");
+const { createNotification } = require("./notificationController");
 
 // ==============================
 // APPLY FOR A JOB
@@ -107,6 +108,17 @@ const applyForJob = (req, res) => {
                                 });
                             }
 
+                            // Send confirmation notification to student
+                            const notifJobQuery = `
+                                SELECT title, company_name FROM jobs WHERE job_id = ?
+                            `;
+                            db.query(notifJobQuery, [job_id], (ne, jobRows) => {
+                                if (!ne && jobRows.length > 0) {
+                                    const msg = `Your application for "${jobRows[0].title}" at ${jobRows[0].company_name} has been submitted successfully.`;
+                                    createNotification(user_id, msg);
+                                }
+                            });
+
                             res.status(201).json({
                                 message: "Job application submitted successfully",
                                 application_id: result.insertId
@@ -190,6 +202,7 @@ const getRecruiterApplications = (req, res) => {
             s.degree,
             s.skills,
             s.resume,
+            s.resume_file,
 
             j.job_id,
             j.title AS job_title,
@@ -304,6 +317,24 @@ const updateApplicationStatus = (req, res) => {
                             error: err.message
                         });
                     }
+
+                    // Send notification to the student
+                    const notifQuery = `
+                        SELECT u.user_id, j.title, j.company_name
+                        FROM applications a
+                        INNER JOIN students s ON a.student_id = s.student_id
+                        INNER JOIN users u    ON s.user_id = u.user_id
+                        INNER JOIN jobs j     ON a.job_id = j.job_id
+                        WHERE a.application_id = ?
+                    `;
+
+                    db.query(notifQuery, [application_id], (notifErr, notifRows) => {
+                        if (!notifErr && notifRows.length > 0) {
+                            const row = notifRows[0];
+                            const message = `Your application for "${row.title}" at ${row.company_name} has been updated to: ${status}.`;
+                            createNotification(row.user_id, message);
+                        }
+                    });
 
                     res.status(200).json({
                         message: "Application status updated successfully",

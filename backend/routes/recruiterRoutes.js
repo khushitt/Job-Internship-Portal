@@ -1,6 +1,6 @@
-const express = require("express");
 
-const router = express.Router();
+const express = require("express");
+const router  = express.Router();
 
 const {
     createRecruiterProfile,
@@ -8,8 +8,10 @@ const {
     updateRecruiterProfile
 } = require("../controllers/recruiterController");
 
+const { getRecruiterAnalytics } = require("../controllers/analyticsController");
+
 const authenticateToken = require("../middleware/authMiddleware");
-const authorizeRole = require("../middleware/roleMiddleware");
+const authorizeRole     = require("../middleware/roleMiddleware");
 
 // Create Recruiter Profile
 router.post(
@@ -33,6 +35,14 @@ router.put(
     authenticateToken,
     authorizeRole("recruiter"),
     updateRecruiterProfile
+);
+
+// Recruiter Analytics
+router.get(
+    "/analytics",
+    authenticateToken,
+    authorizeRole("recruiter"),
+    getRecruiterAnalytics
 );
 
 module.exports = router;

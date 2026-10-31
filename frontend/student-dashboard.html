@@ -1,18 +1,12 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Student Dashboard | CareerConnect</title>
-
     <link rel="stylesheet" href="css/auth.css">
-
     <style>
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
@@ -21,959 +15,1136 @@
             color: #30204f;
         }
 
+        /* ---- NAVBAR ---- */
         .dashboard-navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 7%;
+            padding: 18px 7%;
             background: white;
-            box-shadow: 0 3px 15px rgba(60, 30, 100, 0.08);
+            box-shadow: 0 3px 15px rgba(60,30,100,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+            gap: 12px;
         }
-
-        .brand {
-            color: #7c3aed;
-            font-size: 25px;
-            font-weight: 800;
-            text-decoration: none;
-        }
-
-        .navbar-links {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .navbar-links a {
-            color: #6d28a8;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .logout-btn {
+        .brand { color:#7c3aed; font-size:24px; font-weight:800; text-decoration:none; }
+        .navbar-links { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+        .navbar-links a { color:#6d28a8; text-decoration:none; font-weight:bold; font-size:15px; }
+        .notif-btn {
+            position: relative;
+            background: none;
             border: none;
-            border-radius: 8px;
-            padding: 11px 20px;
-            background: #7c3aed;
-            color: white;
-            font-weight: bold;
             cursor: pointer;
+            font-size: 22px;
+            padding: 4px;
+            line-height: 1;
         }
-
-        .logout-btn:hover {
-            background: #5b21b6;
+        .notif-badge {
+            position: absolute;
+            top: -2px; right: -4px;
+            background: #ef4444;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            border-radius: 50%;
+            width: 17px; height: 17px;
+            display: flex; align-items: center; justify-content: center;
         }
+        .notif-badge.hidden { display:none; }
+        .logout-btn {
+            border: none; border-radius: 8px;
+            padding: 10px 18px;
+            background: #7c3aed; color: white;
+            font-weight: bold; cursor: pointer; font-size:14px;
+        }
+        .logout-btn:hover { background:#5b21b6; }
 
+        /* ---- TABS ---- */
+        .tab-bar {
+            display: flex;
+            overflow-x: auto;
+            gap: 6px;
+            padding: 18px 7% 0;
+            background: white;
+            border-bottom: 2px solid #ede9fe;
+        }
+        .tab-btn {
+            padding: 10px 18px;
+            border: none;
+            background: none;
+            color: #6d28a8;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+        .tab-btn.active {
+            border-bottom-color: #7c3aed;
+            color: #7c3aed;
+        }
+        .tab-btn:hover { color:#9333ea; }
+
+        /* ---- CONTENT ---- */
         .dashboard-content {
             max-width: 1100px;
-            margin: 45px auto;
+            margin: 32px auto;
             padding: 0 24px;
         }
 
         .welcome-section {
-            padding: 35px;
+            padding: 30px;
             border-radius: 18px;
             background: linear-gradient(120deg, #ede9fe, #f5eaff);
+            margin-bottom: 28px;
         }
+        .welcome-section h1 { margin:0 0 8px; font-size:28px; color:#4c1d95; }
+        .welcome-section p  { color:#655778; line-height:1.7; margin:0; }
 
-        .welcome-section h1 {
-            margin: 0 0 12px;
-            font-size: 32px;
-            color: #4c1d95;
-            overflow-wrap: anywhere;
-        }
-
-        .welcome-section p {
-            color: #655778;
-            line-height: 1.7;
-        }
-
-        .section-title {
-            margin: 35px 0 20px;
-            font-size: 23px;
-        }
-
-        .dashboard-grid {
+        .stat-grid {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 22px;
+            grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
+            gap: 16px;
+            margin-bottom: 28px;
         }
+        .stat-card {
+            background: white;
+            border: 1px solid #eee5ff;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(60,30,100,0.05);
+            text-align: center;
+        }
+        .stat-card .icon { font-size:26px; }
+        .stat-card .num  { font-size:28px; font-weight:bold; color:#7c3aed; margin:6px 0; }
+        .stat-card .lbl  { font-size:13px; color:#756987; }
 
-        .dashboard-card {
-            padding: 25px;
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .panel {
             background: white;
             border: 1px solid #eee5ff;
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(60, 30, 100, 0.05);
+            padding: 26px;
+            box-shadow: 0 5px 18px rgba(60,30,100,0.05);
+            margin-bottom: 22px;
         }
+        .panel h2 { margin-top:0; color:#4c1d95; font-size:20px; }
 
-        .dashboard-card .icon {
-            font-size: 30px;
+        .btn {
+            padding: 10px 18px;
+            border: none; border-radius: 8px;
+            font-size: 14px; font-weight: bold;
+            cursor: pointer;
         }
+        .btn-primary { background:#7c3aed; color:white; }
+        .btn-primary:hover { background:#5b21b6; }
+        .btn-secondary { background:#ede9fe; color:#6d28a8; }
+        .btn-secondary:hover { background:#ddd5f8; }
+        .btn-danger { background:#fee2e2; color:#b91c1c; }
+        .btn-danger:hover { background:#fecaca; }
+        .btn:disabled { opacity:.6; cursor:not-allowed; }
 
-        .dashboard-card h3 {
-            margin-bottom: 10px;
+        .msg-box {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 10px 0;
+            display: none;
         }
+        .msg-box.success { background:#d1fae5; color:#065f46; display:block; }
+        .msg-box.error   { background:#fee2e2; color:#991b1b; display:block; }
+        .msg-box.info    { background:#dbeafe; color:#1e40af; display:block; }
 
-        .dashboard-card p {
-            min-height: 48px;
-            color: #756987;
-            line-height: 1.6;
-        }
-
-        .stat-number {
-            color: #7c3aed;
-            font-size: 30px;
-            font-weight: bold;
-            margin: 12px 0;
-        }
-
-        .card-link {
-            display: inline-block;
-            margin-top: 10px;
-            color: #7c3aed;
-            font-weight: bold;
-            text-decoration: none;
-        }
-
-        .card-link:hover {
-            text-decoration: underline;
-        }
-
-        .content-panel {
-            margin-top: 28px;
-            padding: 28px;
-            background: white;
-            border: 1px solid #eee5ff;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(60, 30, 100, 0.05);
-            scroll-margin-top: 25px;
-        }
-
-        .content-panel h2 {
-            margin-top: 0;
-            color: #4c1d95;
-        }
-
-        .panel-description {
-            color: #756987;
-            line-height: 1.6;
-        }
-
+        /* profile grid */
         .profile-grid {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 18px;
-            margin-top: 22px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            margin-top: 18px;
         }
-
+        @media(max-width:600px){ .profile-grid { grid-template-columns:1fr; } }
         .profile-field {
-            padding: 15px;
-            border-radius: 10px;
             background: #faf7ff;
             border: 1px solid #eee5ff;
-            overflow-wrap: anywhere;
+            border-radius: 10px;
+            padding: 14px;
         }
+        .profile-field strong { display:block; color:#756987; font-size:12px; margin-bottom:6px; text-transform:uppercase; letter-spacing:.5px; }
+        .profile-field span   { color:#30204f; line-height:1.5; word-break:break-word; }
 
-        .profile-field strong {
-            display: block;
-            color: #756987;
-            font-size: 13px;
-            margin-bottom: 8px;
-        }
-
-        .profile-field span {
-            color: #30204f;
-            line-height: 1.5;
-            white-space: pre-wrap;
-        }
-
-        .applications-list {
+        /* job cards */
+        .jobs-grid {
             display: grid;
-            gap: 16px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(280px,1fr));
+            gap: 18px;
+            margin-top: 18px;
         }
-
-        .application-card {
-            padding: 20px;
+        .job-card {
             border: 1px solid #eee5ff;
             border-radius: 12px;
+            padding: 20px;
             background: #fdfbff;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
-
-        .application-card h3 {
-            color: #4c1d95;
-            margin: 0 0 8px;
-            overflow-wrap: anywhere;
-        }
-
-        .application-card p {
-            color: #756987;
-            line-height: 1.6;
-            margin: 7px 0;
-            overflow-wrap: anywhere;
-        }
-
-        .status-badge {
+        .job-card h3 { margin:0; color:#4c1d95; font-size:17px; }
+        .job-card .company { font-weight:bold; color:#49365f; }
+        .job-card .meta    { color:#756987; font-size:13px; line-height:1.6; }
+        .job-card .actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; }
+        .match-badge {
             display: inline-block;
-            padding: 7px 12px;
+            padding: 4px 10px;
             border-radius: 20px;
-            background: #eee5fa;
-            color: #58358a;
+            font-size: 12px;
+            font-weight: bold;
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .match-badge.medium { background:#fef3c7; color:#92400e; }
+        .match-badge.low    { background:#fee2e2; color:#991b1b; }
+        .skills-tag { font-size:12px; color:#6d28a8; }
+
+        /* applications */
+        .application-card {
+            border: 1px solid #eee5ff;
+            border-radius: 12px;
+            padding: 18px;
+            background: #fdfbff;
+            margin-bottom: 14px;
+        }
+        .application-card h3 { margin:0 0 6px; color:#4c1d95; }
+        .app-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
             font-size: 12px;
             font-weight: bold;
         }
+        .status-applied      { background:#dbeafe; color:#1e40af; }
+        .status-shortlisted  { background:#fef3c7; color:#92400e; }
+        .status-selected     { background:#d1fae5; color:#065f46; }
+        .status-rejected     { background:#fee2e2; color:#991b1b; }
 
-        .status-pending {
-            background: #fff3cd;
-            color: #856404;
+        /* notifications */
+        .notif-item {
+            border-bottom: 1px solid #f3e8ff;
+            padding: 14px 0;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
         }
-
-        .status-shortlisted {
-            background: #dff5e5;
-            color: #23633a;
+        .notif-item:last-child { border-bottom: none; }
+        .notif-item .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #7c3aed;
+            flex-shrink: 0;
+            margin-top: 6px;
         }
+        .notif-item.read .dot { background: #d1d5db; }
+        .notif-msg  { color:#30204f; line-height:1.5; font-size:14px; flex:1; }
+        .notif-time { font-size:12px; color:#9ca3af; margin-top:4px; }
 
-        .status-accepted {
-            background: #dff5e5;
-            color: #23633a;
-        }
-
-        .status-rejected {
-            background: #ffe5e5;
-            color: #9b2525;
-        }
-
-        .empty-state {
-            padding: 22px;
+        /* resume */
+        .resume-box {
+            border: 2px dashed #c4b5fd;
+            border-radius: 12px;
+            padding: 30px;
             text-align: center;
-            border-radius: 10px;
             background: #faf7ff;
-            color: #756987;
-            line-height: 1.7;
+            margin-top: 16px;
         }
-
-        .message {
-            display: none;
-            margin: 20px 0;
-            padding: 14px 16px;
-            border-radius: 9px;
-            line-height: 1.6;
-            overflow-wrap: anywhere;
-        }
-
-        .message.error {
-            display: block;
-            background: #ffe8e8;
-            color: #9b2525;
-        }
-
-        .message.success {
-            display: block;
-            background: #e5f7eb;
-            color: #23633a;
-        }
-
-        .message.info {
-            display: block;
-            background: #eee5fa;
-            color: #58358a;
-        }
-
-        .refresh-btn {
-            border: none;
-            border-radius: 8px;
-            padding: 10px 15px;
-            background: #eee5fa;
-            color: #58358a;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .refresh-btn:hover {
-            background: #e2d3f6;
-        }
-
-        .panel-heading {
+        .resume-box label { cursor: pointer; color:#7c3aed; font-weight:bold; }
+        .resume-box input { display:none; }
+        .resume-current {
             display: flex;
             align-items: center;
-            justify-content: space-between;
             gap: 12px;
-            flex-wrap: wrap;
+            background: #ede9fe;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 14px;
         }
+        .resume-current span { flex:1; font-weight:bold; color:#4c1d95; word-break:break-all; }
 
-
-        .edit-profile-form {
-            display: none;
-            margin-top: 22px;
-            padding: 22px;
-            border: 1px solid #e5d5ff;
-            border-radius: 12px;
-            background: #fcfaff;
-        }
-
-        .edit-profile-form.visible { display: block; }
-
-        .edit-form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 16px;
-        }
-
-        .edit-form-field { display: flex; flex-direction: column; gap: 7px; }
-        .edit-form-field.full-width { grid-column: 1 / -1; }
-        .edit-form-field label { font-size: 14px; font-weight: bold; color: #58358a; }
-        .edit-form-field input, .edit-form-field textarea {
-            width: 100%; padding: 12px; border: 1px solid #d9c7f5;
-            border-radius: 8px; font: inherit; color: #30204f; background: white;
-        }
-        .edit-form-field input:focus, .edit-form-field textarea:focus {
-            outline: 2px solid #c4b5fd; border-color: #7c3aed;
-        }
-        .edit-form-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
-        .save-profile-btn {
-            border: none; border-radius: 8px; padding: 11px 18px;
-            background: #7c3aed; color: white; font-weight: bold; cursor: pointer;
-        }
-        .save-profile-btn:hover { background: #5b21b6; }
-        .save-profile-btn:disabled { opacity: .65; cursor: wait; }
-        .cancel-edit-btn {
-            border: 1px solid #d9c7f5; border-radius: 8px; padding: 10px 16px;
-            background: white; color: #58358a; font-weight: bold; cursor: pointer;
-        }
-        @media (max-width: 600px) {
-            .edit-form-grid { grid-template-columns: 1fr; }
-            .edit-form-field.full-width { grid-column: auto; }
-        }
-
-        .dashboard-footer {
-            margin-top: 60px;
-            padding: 25px;
+        .empty-state {
             text-align: center;
-            color: #766a85;
+            color: #9ca3af;
+            padding: 30px;
+            font-style: italic;
         }
 
-        @media (max-width: 800px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .navbar-links {
-                gap: 12px;
-                flex-wrap: wrap;
-            }
+        /* profile form */
+        .form-group   { margin-bottom: 16px; }
+        .form-group label { display:block; font-weight:bold; color:#4c1d95; margin-bottom:6px; font-size:14px; }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid #d4c7ef;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
         }
-
-        @media (max-width: 600px) {
-            .dashboard-navbar {
-                padding: 18px 5%;
-                gap: 15px;
-                flex-wrap: wrap;
-            }
-
-            .dashboard-content {
-                margin-top: 25px;
-                padding: 0 16px;
-            }
-
-            .welcome-section {
-                padding: 25px;
-            }
-
-            .welcome-section h1 {
-                font-size: 26px;
-            }
-
-            .profile-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .content-panel {
-                padding: 20px;
-            }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 3px #ede9fe;
         }
+        .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+        @media(max-width:600px){ .form-row { grid-template-columns:1fr; } }
     </style>
 </head>
-
 <body>
 
-    <header class="dashboard-navbar">
-        <a href="index.html" class="brand">CareerConnect</a>
+<!-- NAVBAR -->
+<header class="dashboard-navbar">
+    <a href="index.html" class="brand">CareerConnect</a>
+    <nav class="navbar-links">
+        <a href="jobs.html">Browse Jobs</a>
+        <button class="notif-btn" id="notifBtn" title="Notifications">
+            🔔
+            <span class="notif-badge hidden" id="notifBadge">0</span>
+        </button>
+        <span id="navUserName" style="font-weight:bold; color:#4c1d95;"></span>
+        <button class="logout-btn" id="logoutButton">Logout</button>
+    </nav>
+</header>
 
-        <nav class="navbar-links">
-            <a href="jobs.html">Explore Jobs</a>
-            <button type="button" class="logout-btn" id="logoutButton">
-                Logout
-            </button>
-        </nav>
-    </header>
+<!-- TABS -->
+<nav class="tab-bar">
+    <button class="tab-btn active" data-tab="overview">🏠 Overview</button>
+    <button class="tab-btn" data-tab="profile">👤 Profile</button>
+    <button class="tab-btn" data-tab="recommendations">⭐ Recommended</button>
+    <button class="tab-btn" data-tab="saved">🔖 Saved Jobs</button>
+    <button class="tab-btn" data-tab="applications">📄 Applications</button>
+    <button class="tab-btn" data-tab="resume">📁 Resume</button>
+    <button class="tab-btn" data-tab="notifications">🔔 Notifications</button>
+</nav>
 
-    <main class="dashboard-content">
+<!-- MAIN CONTENT -->
+<main class="dashboard-content">
 
-        <section class="welcome-section">
-            <h1 id="welcomeTitle">Welcome to Your Dashboard!</h1>
+    <!-- MESSAGE BOX -->
+    <div id="globalMsg" class="msg-box"></div>
 
-            <p>
-                Your career journey starts here. Explore opportunities,
-                manage your applications, and take the next step toward
-                your dream job.
-            </p>
-        </section>
+    <!-- ======== OVERVIEW TAB ======== -->
+    <div class="tab-panel active" id="tab-overview">
+        <div class="welcome-section">
+            <h1>Welcome back, <span id="welcomeName">Student</span>! 👋</h1>
+            <p>Here's a quick overview of your CareerConnect dashboard.</p>
+        </div>
 
-        <div id="dashboardMessage" class="message" role="status"
-             aria-live="polite"></div>
-
-        <h2 class="section-title">Your Career Workspace</h2>
-
-        <section class="dashboard-grid">
-
-            <article class="dashboard-card">
-                <div class="icon">💼</div>
-                <h3>Find Jobs & Internships</h3>
-                <p>
-                    Explore opportunities that match your skills and interests.
-                </p>
-                <a href="jobs.html" class="card-link">
-                    Explore opportunities →
-                </a>
-            </article>
-
-            <article class="dashboard-card">
+        <div class="stat-grid">
+            <div class="stat-card">
                 <div class="icon">📄</div>
-                <h3>My Applications</h3>
-                <div class="stat-number" id="applicationCount">—</div>
-                <p>Track the jobs and internships you have applied for.</p>
-                <a href="#applicationsSection" class="card-link"
-                   id="applicationsLink">
-                    View applications →
-                </a>
-            </article>
-
-            <article class="dashboard-card">
-                <div class="icon">👤</div>
-                <h3>My Profile</h3>
-                <p id="profileSummary">
-                    View your professional and educational information.
-                </p>
-                <a href="#profileSection" class="card-link" id="profileLink">
-                    View profile →
-                </a>
-            </article>
-
-        </section>
-
-        <section class="content-panel" id="applicationsSection">
-            <div class="panel-heading">
-                <h2>My Applications</h2>
-                <button type="button" class="refresh-btn"
-                        id="refreshApplicationsButton">
-                    Refresh
-                </button>
+                <div class="num" id="statApplications">—</div>
+                <div class="lbl">Applications</div>
             </div>
-
-            <p class="panel-description">
-                Check your submitted applications and their latest statuses.
-            </p>
-
-            <div id="applicationsList" class="applications-list">
-                <div class="empty-state">Loading your applications...</div>
+            <div class="stat-card">
+                <div class="icon">🔖</div>
+                <div class="num" id="statSaved">—</div>
+                <div class="lbl">Saved Jobs</div>
             </div>
-        </section>
-
-        <section class="content-panel" id="profileSection">
-            <div class="panel-heading">
-                <h2>My Student Profile</h2>
-                <div class="panel-heading">
-                    <button type="button" class="refresh-btn" id="editProfileButton">
-                        ✏️ Edit Profile
-                    </button>
-                    <button type="button" class="refresh-btn" id="refreshProfileButton">
-                        Refresh
-                    </button>
-                </div>
+            <div class="stat-card">
+                <div class="icon">⭐</div>
+                <div class="num" id="statRecommended">—</div>
+                <div class="lbl">Recommended</div>
             </div>
-
-            <p class="panel-description">
-                Your profile information retrieved from CareerConnect.
-            </p>
-
-            <div id="profileDetails" class="profile-grid">
-                <div class="empty-state">Loading your profile...</div>
+            <div class="stat-card">
+                <div class="icon">✅</div>
+                <div class="num" id="statSelected">—</div>
+                <div class="lbl">Selected</div>
             </div>
+        </div>
 
-            <form id="editProfileForm" class="edit-profile-form">
-                <h3>Edit your information</h3>
-                <p class="panel-description">Update your educational and professional details. Your name and email are shown from your account and aren't editable here.</p>
-                <div class="edit-form-grid">
-                    <div class="edit-form-field">
-                        <label for="editPhone">Phone</label>
-                        <input id="editPhone" name="phone" type="tel" maxlength="30" autocomplete="tel">
+        <div class="panel">
+            <h2>Quick Actions</h2>
+            <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:8px;">
+                <button class="btn btn-primary" onclick="switchTab('recommendations')">⭐ View Recommendations</button>
+                <button class="btn btn-secondary" onclick="window.location.href='jobs.html'">🔍 Browse All Jobs</button>
+                <button class="btn btn-secondary" onclick="switchTab('applications')">📄 My Applications</button>
+                <button class="btn btn-secondary" onclick="switchTab('resume')">📁 Manage Resume</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======== PROFILE TAB ======== -->
+    <div class="tab-panel" id="tab-profile">
+        <div class="panel">
+            <h2>My Profile</h2>
+            <div id="profileView">
+                <div class="empty-state">Loading profile...</div>
+            </div>
+            <div style="margin-top:18px; display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="btn btn-primary" id="editProfileBtn">✏️ Edit Profile</button>
+                <button class="btn btn-secondary" id="refreshProfileBtn">🔄 Refresh</button>
+            </div>
+        </div>
+
+        <div class="panel" id="editProfilePanel" style="display:none;">
+            <h2>Edit Profile</h2>
+            <form id="profileForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editPhone">Phone Number</label>
+                        <input type="tel" id="editPhone" placeholder="Your phone number">
                     </div>
-                    <div class="edit-form-field">
-                        <label for="editCollege">College</label>
-                        <input id="editCollege" name="college" type="text" maxlength="255" required>
-                    </div>
-                    <div class="edit-form-field">
-                        <label for="editDegree">Degree</label>
-                        <input id="editDegree" name="degree" type="text" maxlength="255" required>
-                    </div>
-                    <div class="edit-form-field">
-                        <label for="editResume">Resume filename or link</label>
-                        <input id="editResume" name="resume" type="text" maxlength="500" placeholder="e.g. my-resume.pdf">
-                    </div>
-                    <div class="edit-form-field full-width">
-                        <label for="editSkills">Skills</label>
-                        <textarea id="editSkills" name="skills" rows="3" maxlength="2000" placeholder="e.g. HTML, CSS, JavaScript"></textarea>
+                    <div class="form-group">
+                        <label for="editCollege">College / University *</label>
+                        <input type="text" id="editCollege" placeholder="e.g. IIT Delhi" required>
                     </div>
                 </div>
-                <div class="edit-form-actions">
-                    <button type="submit" class="save-profile-btn" id="saveProfileButton">Save Changes</button>
-                    <button type="button" class="cancel-edit-btn" id="cancelEditButton">Cancel</button>
+                <div class="form-group">
+                    <label for="editDegree">Degree *</label>
+                    <input type="text" id="editDegree" placeholder="e.g. B.Tech Computer Science" required>
+                </div>
+                <div class="form-group">
+                    <label for="editSkills">Skills (comma-separated)</label>
+                    <textarea id="editSkills" placeholder="e.g. JavaScript, React, Node.js, MySQL"></textarea>
+                </div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button type="submit" class="btn btn-primary" id="saveProfileBtn">💾 Save Profile</button>
+                    <button type="button" class="btn btn-secondary" id="cancelEditBtn">Cancel</button>
                 </div>
             </form>
-        </section>
+        </div>
+    </div>
 
-        <footer class="dashboard-footer">
-            © 2026 CareerConnect. Connecting talent with opportunities.
-        </footer>
+    <!-- ======== RECOMMENDATIONS TAB ======== -->
+    <div class="tab-panel" id="tab-recommendations">
+        <div class="panel">
+            <h2>⭐ Recommended Jobs for You</h2>
+            <p style="color:#756987; margin:0 0 16px;">Jobs matched to your skills, ranked by compatibility.</p>
+            <button class="btn btn-secondary" id="refreshRecommBtn" style="margin-bottom:16px;">🔄 Refresh</button>
+            <div id="recommendationsList"><div class="empty-state">Loading recommendations...</div></div>
+        </div>
+    </div>
 
-    </main>
+    <!-- ======== SAVED JOBS TAB ======== -->
+    <div class="tab-panel" id="tab-saved">
+        <div class="panel">
+            <h2>🔖 Saved Jobs</h2>
+            <p style="color:#756987; margin:0 0 16px;">Jobs you've bookmarked for later.</p>
+            <button class="btn btn-secondary" id="refreshSavedBtn" style="margin-bottom:16px;">🔄 Refresh</button>
+            <div id="savedJobsList"><div class="empty-state">Loading saved jobs...</div></div>
+        </div>
+    </div>
 
-    <script>
-        const API_BASE_URL = "http://localhost:5000/api";
+    <!-- ======== APPLICATIONS TAB ======== -->
+    <div class="tab-panel" id="tab-applications">
+        <div class="panel">
+            <h2>📄 My Applications</h2>
+            <p style="color:#756987; margin:0 0 16px;">Track the status of your job applications.</p>
+            <button class="btn btn-secondary" id="refreshApplicationsBtn" style="margin-bottom:16px;">🔄 Refresh</button>
+            <div id="applicationsList"><div class="empty-state">Loading applications...</div></div>
+        </div>
+    </div>
 
-        const token = localStorage.getItem("token");
-        const role = localStorage.getItem("role");
+    <!-- ======== RESUME TAB ======== -->
+    <div class="tab-panel" id="tab-resume">
+        <div class="panel">
+            <h2>📁 Resume Management</h2>
+            <p style="color:#756987; margin:0;">Upload your resume (PDF, DOC, DOCX — max 5 MB).</p>
 
-        const welcomeTitle = document.getElementById("welcomeTitle");
-        const dashboardMessage = document.getElementById("dashboardMessage");
-        const applicationCount = document.getElementById("applicationCount");
-        const applicationsList = document.getElementById("applicationsList");
-        const profileDetails = document.getElementById("profileDetails");
-        const profileSummary = document.getElementById("profileSummary");
+            <div id="currentResumeBox" style="display:none;" class="resume-current">
+                <span>📄</span>
+                <span id="currentResumeFilename">resume.pdf</span>
+                <a id="viewResumeLink" href="#" target="_blank" class="btn btn-secondary" style="font-size:12px; padding:6px 12px;">View</a>
+                <button class="btn btn-danger" id="deleteResumeBtn" style="font-size:12px; padding:6px 12px;">Delete</button>
+            </div>
+            <div id="noResumeBox" style="margin-top:14px;">
+                <p style="color:#9ca3af; font-style:italic;">No resume uploaded yet.</p>
+            </div>
 
-        let myApplications = [];
-        let currentStudentProfile = null;
+            <div class="resume-box" style="margin-top:20px;">
+                <p style="margin:0 0 12px; color:#4c1d95; font-size:15px;">
+                    📤 Upload New Resume
+                </p>
+                <label for="resumeInput">
+                    Click to select file (PDF, DOC, DOCX — max 5 MB)
+                </label>
+                <input type="file" id="resumeInput" accept=".pdf,.doc,.docx">
+                <div id="selectedFileLabel" style="margin-top:10px; color:#756987; font-size:14px;"></div>
+                <button class="btn btn-primary" id="uploadResumeBtn" style="margin-top:14px;" disabled>
+                    ⬆️ Upload Resume
+                </button>
+            </div>
+        </div>
+    </div>
 
-        // Require a student login before loading private information.
-        if (!token) {
-            window.location.replace("login.html");
-        } else if (role !== "student") {
-            window.location.replace("index.html");
+    <!-- ======== NOTIFICATIONS TAB ======== -->
+    <div class="tab-panel" id="tab-notifications">
+        <div class="panel">
+            <h2>🔔 Notifications</h2>
+            <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap;">
+                <button class="btn btn-secondary" id="refreshNotifBtn">🔄 Refresh</button>
+                <button class="btn btn-secondary" id="markAllReadBtn">✅ Mark All as Read</button>
+            </div>
+            <div id="notificationsList"><div class="empty-state">Loading notifications...</div></div>
+        </div>
+    </div>
+
+</main>
+
+<script>
+const API = "http://localhost:5000/api";
+const token = localStorage.getItem("token");
+const role  = localStorage.getItem("role");
+
+// ---- Auth guard ----
+if (!token || role !== "student") {
+    window.location.replace("login.html");
+}
+
+// ---- Global state ----
+let studentProfile = null;
+let myApplicationIds = new Set();
+
+// ---- Show name in navbar ----
+const storedName = localStorage.getItem("name") || "";
+document.getElementById("navUserName").textContent = storedName;
+document.getElementById("welcomeName").textContent = storedName || "Student";
+
+// ==============================
+// UTILS
+// ==============================
+
+function showMsg(text, type) {
+    const box = document.getElementById("globalMsg");
+    box.textContent = text;
+    box.className = "msg-box " + type;
+    setTimeout(() => { box.className = "msg-box"; }, 4000);
+}
+
+function fmtDate(dt) {
+    if (!dt) return "—";
+    return new Date(dt).toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" });
+}
+
+function safeText(v) { return v !== null && v !== undefined && v !== "" ? v : "—"; }
+
+async function apiGet(path) {
+    const res = await fetch(API + path, {
+        headers: { "Authorization": "Bearer " + token }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Request failed");
+    return data;
+}
+
+async function apiPost(path, body) {
+    const res = await fetch(API + path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+        body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Request failed");
+    return data;
+}
+
+async function apiPut(path, body) {
+    const res = await fetch(API + path, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+        body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Request failed");
+    return data;
+}
+
+async function apiDelete(path) {
+    const res = await fetch(API + path, {
+        method: "DELETE",
+        headers: { "Authorization": "Bearer " + token }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Request failed");
+    return data;
+}
+
+// ==============================
+// TAB SWITCHING
+// ==============================
+
+function switchTab(tabId) {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+    document.querySelector(`[data-tab="${tabId}"]`).classList.add("active");
+    document.getElementById("tab-" + tabId).classList.add("active");
+}
+
+document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+});
+
+document.getElementById("notifBtn").addEventListener("click", () => {
+    switchTab("notifications");
+    loadNotifications();
+});
+
+// ==============================
+// PROFILE
+// ==============================
+
+async function loadProfile() {
+    const view = document.getElementById("profileView");
+    view.innerHTML = '<div class="empty-state">Loading profile...</div>';
+    try {
+        const data = await apiGet("/student/profile");
+        studentProfile = data.profile;
+
+        // Save name in localStorage for future pages
+        if (studentProfile.name) {
+            localStorage.setItem("name", studentProfile.name);
+            document.getElementById("navUserName").textContent = studentProfile.name;
+            document.getElementById("welcomeName").textContent = studentProfile.name;
         }
 
-        function showMessage(message, type) {
-            dashboardMessage.textContent = message;
-            dashboardMessage.className = "message " + type;
+        // Update resume section
+        updateResumeUI(studentProfile.resume_file);
+
+        view.innerHTML = "";
+        const grid = document.createElement("div");
+        grid.className = "profile-grid";
+
+        const fields = [
+            ["Name",     studentProfile.name],
+            ["Email",    studentProfile.email],
+            ["Phone",    studentProfile.phone],
+            ["College",  studentProfile.college],
+            ["Degree",   studentProfile.degree],
+            ["Skills",   studentProfile.skills]
+        ];
+
+        fields.forEach(([label, value]) => {
+            const f = document.createElement("div");
+            f.className = "profile-field";
+            f.innerHTML = `<strong>${label}</strong><span>${safeText(value)}</span>`;
+            grid.appendChild(f);
+        });
+
+        view.appendChild(grid);
+
+        // Populate edit form
+        document.getElementById("editPhone").value   = studentProfile.phone   || "";
+        document.getElementById("editCollege").value = studentProfile.college || "";
+        document.getElementById("editDegree").value  = studentProfile.degree  || "";
+        document.getElementById("editSkills").value  = studentProfile.skills  || "";
+
+    } catch (err) {
+        view.innerHTML = `<div class="empty-state">${err.message}</div>`;
+    }
+}
+
+document.getElementById("editProfileBtn").addEventListener("click", () => {
+    document.getElementById("editProfilePanel").style.display = "block";
+    document.getElementById("editProfileBtn").style.display   = "none";
+});
+
+document.getElementById("cancelEditBtn").addEventListener("click", () => {
+    document.getElementById("editProfilePanel").style.display = "none";
+    document.getElementById("editProfileBtn").style.display   = "inline-block";
+});
+
+document.getElementById("profileForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById("saveProfileBtn");
+    btn.disabled = true;
+    btn.textContent = "Saving...";
+
+    try {
+        await apiPut("/student/profile", {
+            phone:   document.getElementById("editPhone").value.trim(),
+            college: document.getElementById("editCollege").value.trim(),
+            degree:  document.getElementById("editDegree").value.trim(),
+            skills:  document.getElementById("editSkills").value.trim()
+        });
+        showMsg("Profile updated successfully!", "success");
+        document.getElementById("editProfilePanel").style.display = "none";
+        document.getElementById("editProfileBtn").style.display   = "inline-block";
+        await loadProfile();
+        await loadOverviewStats();
+    } catch (err) {
+        showMsg(err.message, "error");
+    } finally {
+        btn.disabled = false;
+        btn.textContent = "💾 Save Profile";
+    }
+});
+
+document.getElementById("refreshProfileBtn").addEventListener("click", async () => {
+    await loadProfile();
+    showMsg("Profile refreshed.", "info");
+});
+
+// ==============================
+// RECOMMENDATIONS
+// ==============================
+
+async function loadRecommendations() {
+    const list = document.getElementById("recommendationsList");
+    list.innerHTML = '<div class="empty-state">Loading recommendations...</div>';
+    try {
+        const data = await apiGet("/student/recommendations");
+        const recs = data.recommendations || [];
+
+        document.getElementById("statRecommended").textContent = recs.length;
+
+        if (!recs.length) {
+            list.innerHTML = '<div class="empty-state">No recommendations yet. Add skills to your profile to see matched jobs!</div>';
+            return;
         }
 
-        function clearMessage() {
-            dashboardMessage.textContent = "";
-            dashboardMessage.className = "message";
+        list.innerHTML = "";
+        const grid = document.createElement("div");
+        grid.className = "jobs-grid";
+
+        recs.forEach(job => {
+            const pct = job.match_percentage;
+            const badgeClass = pct >= 70 ? "" : pct >= 40 ? "medium" : "low";
+
+            const card = document.createElement("div");
+            card.className = "job-card";
+            card.innerHTML = `
+                <h3>${safeText(job.title)}</h3>
+                <div class="company">${safeText(job.company_name)}</div>
+                <div class="meta">
+                    📍 ${safeText(job.location)} &nbsp;|&nbsp; 💼 ${safeText(job.job_type)}<br>
+                    ${job.salary ? "💰 " + job.salary : ""}
+                </div>
+                <div>
+                    <span class="match-badge ${badgeClass}">${pct}% Match</span>
+                </div>
+                ${job.matched_skills.length ? `<div class="skills-tag">✅ Matched: ${job.matched_skills.join(", ")}</div>` : ""}
+                ${job.missing_skills.length ? `<div class="skills-tag" style="color:#b91c1c;">❌ Missing: ${job.missing_skills.join(", ")}</div>` : ""}
+            `;
+
+            const actions = document.createElement("div");
+            actions.className = "actions";
+
+            // Apply button
+            const applyBtn = document.createElement("button");
+            applyBtn.className = "btn btn-primary";
+            applyBtn.style.fontSize = "13px";
+            applyBtn.style.padding  = "8px 14px";
+
+            if (myApplicationIds.has(Number(job.job_id))) {
+                applyBtn.textContent = "✅ Applied";
+                applyBtn.disabled = true;
+            } else {
+                applyBtn.textContent = "Apply Now";
+                applyBtn.addEventListener("click", () => applyJob(job.job_id, applyBtn));
+            }
+
+            // Save button
+            const saveBtn = document.createElement("button");
+            saveBtn.className = "btn btn-secondary";
+            saveBtn.style.fontSize = "13px";
+            saveBtn.style.padding  = "8px 14px";
+            saveBtn.textContent = job.is_saved ? "🔖 Saved" : "🔖 Save";
+            if (job.is_saved) saveBtn.disabled = true;
+            saveBtn.addEventListener("click", () => saveJobFn(job.job_id, saveBtn));
+
+            actions.appendChild(applyBtn);
+            actions.appendChild(saveBtn);
+            card.appendChild(actions);
+            grid.appendChild(card);
+        });
+
+        list.appendChild(grid);
+    } catch (err) {
+        list.innerHTML = `<div class="empty-state">${err.message}</div>`;
+    }
+}
+
+document.getElementById("refreshRecommBtn").addEventListener("click", loadRecommendations);
+
+// ==============================
+// SAVED JOBS
+// ==============================
+
+async function loadSavedJobs() {
+    const list = document.getElementById("savedJobsList");
+    list.innerHTML = '<div class="empty-state">Loading saved jobs...</div>';
+    try {
+        const data = await apiGet("/student/saved-jobs");
+        const jobs = data.saved_jobs || [];
+
+        document.getElementById("statSaved").textContent = jobs.length;
+
+        if (!jobs.length) {
+            list.innerHTML = '<div class="empty-state">No saved jobs yet. Browse jobs and bookmark ones you like!</div>';
+            return;
         }
 
-        function makeElement(tag, className, text) {
-            const element = document.createElement(tag);
+        list.innerHTML = "";
+        const grid = document.createElement("div");
+        grid.className = "jobs-grid";
 
-            if (className) {
-                element.className = className;
+        jobs.forEach(job => {
+            const card = document.createElement("div");
+            card.className = "job-card";
+            card.innerHTML = `
+                <h3>${safeText(job.title)}</h3>
+                <div class="company">${safeText(job.company_name)}</div>
+                <div class="meta">
+                    📍 ${safeText(job.location)} &nbsp;|&nbsp; 💼 ${safeText(job.job_type)}<br>
+                    ${job.salary ? "💰 " + job.salary + "<br>" : ""}
+                    🕐 Saved: ${fmtDate(job.saved_at)}
+                </div>
+            `;
+
+            const actions = document.createElement("div");
+            actions.className = "actions";
+
+            const applyBtn = document.createElement("button");
+            applyBtn.className = "btn btn-primary";
+            applyBtn.style.fontSize = "13px";
+            applyBtn.style.padding  = "8px 14px";
+
+            if (job.already_applied || myApplicationIds.has(Number(job.job_id))) {
+                applyBtn.textContent = "✅ Applied";
+                applyBtn.disabled = true;
+            } else {
+                applyBtn.textContent = "Apply Now";
+                applyBtn.addEventListener("click", () => applyJob(job.job_id, applyBtn));
             }
 
-            if (text !== undefined && text !== null && text !== "") {
-                element.textContent = String(text);
-            }
-
-            return element;
-        }
-
-        function formatValue(value) {
-            if (value === undefined || value === null || value === "") {
-                return "Not provided";
-            }
-
-            if (Array.isArray(value)) {
-                return value.length ? value.join(", ") : "Not provided";
-            }
-
-            return String(value);
-        }
-
-        function formatDate(value) {
-            if (!value) {
-                return "Not available";
-            }
-
-            const date = new Date(value);
-
-            if (Number.isNaN(date.getTime())) {
-                return String(value);
-            }
-
-            return date.toLocaleDateString("en-IN", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric"
+            const removeBtn = document.createElement("button");
+            removeBtn.className = "btn btn-danger";
+            removeBtn.style.fontSize = "13px";
+            removeBtn.style.padding  = "8px 14px";
+            removeBtn.textContent = "Remove";
+            removeBtn.addEventListener("click", async () => {
+                removeBtn.disabled = true;
+                removeBtn.textContent = "Removing...";
+                try {
+                    await apiDelete("/student/saved-jobs/" + job.job_id);
+                    showMsg("Job removed from saved list.", "info");
+                    await loadSavedJobs();
+                } catch (err) {
+                    showMsg(err.message, "error");
+                    removeBtn.disabled = false;
+                    removeBtn.textContent = "Remove";
+                }
             });
-        }
 
-        function getStatus(application) {
-            return (
-                application.application_status ||
-                application.status ||
-                "Pending"
-            );
-        }
-
-        function getStatusClass(status) {
-            const normalized = String(status).toLowerCase();
-
-            if (normalized.includes("shortlist")) {
-                return "status-badge status-shortlisted";
-            }
-
-            if (normalized.includes("accept") || normalized === "selected") {
-                return "status-badge status-accepted";
-            }
-
-            if (normalized.includes("reject")) {
-                return "status-badge status-rejected";
-            }
-
-            if (normalized.includes("pending") || normalized.includes("review")) {
-                return "status-badge status-pending";
-            }
-
-            return "status-badge";
-        }
-
-        function getApplicationsArray(data) {
-            if (Array.isArray(data)) {
-                return data;
-            }
-
-            if (data && Array.isArray(data.applications)) {
-                return data.applications;
-            }
-
-            if (data && Array.isArray(data.data)) {
-                return data.data;
-            }
-
-            return [];
-        }
-
-        // Display a profile field safely using textContent.
-        function addProfileField(label, value) {
-            const field = makeElement("div", "profile-field");
-            const heading = makeElement("strong", "", label);
-            const content = makeElement("span", "", formatValue(value));
-
-            field.appendChild(heading);
-            field.appendChild(content);
-            profileDetails.appendChild(field);
-        }
-
-        async function loadStudentProfile() {
-            profileDetails.replaceChildren();
-
-            try {
-                const response = await fetch(
-                    API_BASE_URL + "/student/profile",
-                    {
-                        method: "GET",
-                        headers: {
-                            "Authorization": "Bearer " + token
-                        }
-                    }
-                );
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(
-                        data.message || "Could not load student profile."
-                    );
-                }
-
-                const profile = data.profile || data.student || data.data;
-
-                if (!profile) {
-                    currentStudentProfile = null;
-                    profileDetails.appendChild(
-                        makeElement(
-                            "div",
-                            "empty-state",
-                            "Your profile has not been created yet. Please complete your student profile."
-                        )
-                    );
-
-                    profileSummary.textContent =
-                        "Your student profile is not available yet.";
-
-                    return;
-                }
-
-                currentStudentProfile = profile;
-                const savedName = localStorage.getItem("name");
-                const displayName =
-                    profile.name ||
-                    profile.full_name ||
-                    savedName ||
-                    "Student";
-
-                welcomeTitle.textContent = "Welcome, " + displayName + "!";
-
-                profileSummary.textContent =
-                    profile.college || profile.degree
-                        ? [profile.degree, profile.college]
-                              .filter(Boolean)
-                              .join(" • ")
-                        : "View your professional and educational information.";
-
-                addProfileField("Full Name", displayName);
-                addProfileField(
-                    "Email",
-                    profile.email || localStorage.getItem("email")
-                );
-                addProfileField("Phone", profile.phone);
-                addProfileField("College", profile.college);
-                addProfileField("Degree", profile.degree);
-                addProfileField("Skills", profile.skills);
-                addProfileField("Resume", profile.resume);
-                populateEditProfileForm(profile);
-
-            } catch (error) {
-                console.error("Profile loading error:", error);
-
-                profileDetails.appendChild(
-                    makeElement(
-                        "div",
-                        "empty-state",
-                        "Unable to load your profile. Check the backend server and GET /api/student/profile."
-                    )
-                );
-
-                profileSummary.textContent =
-                    "Your profile information could not be loaded.";
-            }
-        }
-
-        function populateEditProfileForm(profile) {
-            document.getElementById("editPhone").value = profile.phone || "";
-            document.getElementById("editCollege").value = profile.college || "";
-            document.getElementById("editDegree").value = profile.degree || "";
-            document.getElementById("editSkills").value = Array.isArray(profile.skills)
-                ? profile.skills.join(", ")
-                : (profile.skills || "");
-            document.getElementById("editResume").value = profile.resume || "";
-        }
-
-        document.getElementById("editProfileButton").addEventListener("click", function () {
-            if (!currentStudentProfile) {
-                showMessage("Your profile must load before you can edit it.", "error");
-                return;
-            }
-            populateEditProfileForm(currentStudentProfile);
-            document.getElementById("editProfileForm").classList.add("visible");
-            document.getElementById("editProfileForm").scrollIntoView({ behavior: "smooth", block: "nearest" });
-            clearMessage();
+            actions.appendChild(applyBtn);
+            actions.appendChild(removeBtn);
+            card.appendChild(actions);
+            grid.appendChild(card);
         });
 
-        document.getElementById("cancelEditButton").addEventListener("click", function () {
-            document.getElementById("editProfileForm").classList.remove("visible");
-            if (currentStudentProfile) populateEditProfileForm(currentStudentProfile);
-            clearMessage();
+        list.appendChild(grid);
+    } catch (err) {
+        list.innerHTML = `<div class="empty-state">${err.message}</div>`;
+    }
+}
+
+document.getElementById("refreshSavedBtn").addEventListener("click", loadSavedJobs);
+
+// ==============================
+// APPLICATIONS
+// ==============================
+
+async function loadApplications() {
+    const list = document.getElementById("applicationsList");
+    list.innerHTML = '<div class="empty-state">Loading applications...</div>';
+    try {
+        const data = await apiGet("/applications/my-applications");
+        const apps = data.applications || [];
+
+        myApplicationIds = new Set(apps.map(a => Number(a.job_id)));
+
+        document.getElementById("statApplications").textContent = apps.length;
+        const selectedCount = apps.filter(a => a.application_status === "Selected").length;
+        document.getElementById("statSelected").textContent = selectedCount;
+
+        if (!apps.length) {
+            list.innerHTML = '<div class="empty-state">No applications yet. Start applying to jobs!</div>';
+            return;
+        }
+
+        list.innerHTML = "";
+
+        apps.forEach(app => {
+            const statusClass = {
+                Applied:     "status-applied",
+                Shortlisted: "status-shortlisted",
+                Selected:    "status-selected",
+                Rejected:    "status-rejected"
+            }[app.application_status] || "status-applied";
+
+            const card = document.createElement("div");
+            card.className = "application-card";
+            card.innerHTML = `
+                <h3>${safeText(app.title)}</h3>
+                <p style="color:#49365f; font-weight:bold; margin:4px 0 8px;">${safeText(app.company_name)}</p>
+                <p style="color:#756987; font-size:14px; margin:4px 0;">
+                    📍 ${safeText(app.location)} &nbsp;|&nbsp; 💼 ${safeText(app.job_type)}
+                </p>
+                <p style="color:#756987; font-size:14px; margin:4px 0;">
+                    📅 Applied: ${fmtDate(app.applied_at)}
+                </p>
+                <div style="margin-top:8px;">
+                    Status: <span class="app-status ${statusClass}">${app.application_status}</span>
+                </div>
+            `;
+            list.appendChild(card);
         });
+    } catch (err) {
+        list.innerHTML = `<div class="empty-state">${err.message}</div>`;
+    }
+}
 
-        document.getElementById("editProfileForm").addEventListener("submit", async function (event) {
-            event.preventDefault();
-            const saveButton = document.getElementById("saveProfileButton");
-            const originalButtonText = saveButton.textContent;
-            saveButton.disabled = true;
-            saveButton.textContent = "Saving...";
-            clearMessage();
+document.getElementById("refreshApplicationsBtn").addEventListener("click", loadApplications);
 
-            const payload = {
-                phone: document.getElementById("editPhone").value.trim(),
-                college: document.getElementById("editCollege").value.trim(),
-                degree: document.getElementById("editDegree").value.trim(),
-                skills: document.getElementById("editSkills").value.trim(),
-                resume: document.getElementById("editResume").value.trim()
-            };
+// ==============================
+// APPLY / SAVE JOB HELPERS
+// ==============================
 
-            try {
-                const response = await fetch(API_BASE_URL + "/student/profile", {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "Bearer " + token
-                    },
-                    body: JSON.stringify(payload)
+async function applyJob(jobId, btn) {
+    btn.disabled = true;
+    btn.textContent = "Applying...";
+    try {
+        await apiPost("/applications/apply", { job_id: jobId });
+        myApplicationIds.add(Number(jobId));
+        btn.textContent = "✅ Applied";
+        showMsg("Application submitted!", "success");
+        loadOverviewStats();
+    } catch (err) {
+        showMsg(err.message, "error");
+        btn.disabled = false;
+        btn.textContent = "Apply Now";
+    }
+}
+
+async function saveJobFn(jobId, btn) {
+    btn.disabled = true;
+    btn.textContent = "Saving...";
+    try {
+        await apiPost("/student/save-job", { job_id: jobId });
+        btn.textContent = "🔖 Saved";
+        showMsg("Job saved!", "success");
+        document.getElementById("statSaved").textContent =
+            Number(document.getElementById("statSaved").textContent || 0) + 1;
+    } catch (err) {
+        showMsg(err.message, "error");
+        btn.disabled = false;
+        btn.textContent = "🔖 Save";
+    }
+}
+
+// ==============================
+// RESUME
+// ==============================
+
+function updateResumeUI(resumeFile) {
+    const currentBox  = document.getElementById("currentResumeBox");
+    const noBox       = document.getElementById("noResumeBox");
+    const nameSpan    = document.getElementById("currentResumeFilename");
+    const viewLink    = document.getElementById("viewResumeLink");
+
+    if (resumeFile) {
+        currentBox.style.display = "flex";
+        noBox.style.display      = "none";
+        nameSpan.textContent     = resumeFile;
+        viewLink.href            = API + "/student/resume/" + resumeFile;
+    } else {
+        currentBox.style.display = "none";
+        noBox.style.display      = "block";
+    }
+}
+
+document.getElementById("resumeInput").addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    const label = document.getElementById("selectedFileLabel");
+    const btn   = document.getElementById("uploadResumeBtn");
+    if (file) {
+        label.textContent = "Selected: " + file.name + " (" + (file.size / 1024).toFixed(1) + " KB)";
+        btn.disabled = false;
+    } else {
+        label.textContent = "";
+        btn.disabled = true;
+    }
+});
+
+document.getElementById("uploadResumeBtn").addEventListener("click", async () => {
+    const file = document.getElementById("resumeInput").files[0];
+    if (!file) return;
+
+    const btn = document.getElementById("uploadResumeBtn");
+    btn.disabled = true;
+    btn.textContent = "Uploading...";
+
+    const formData = new FormData();
+    formData.append("resume", file);
+
+    try {
+        const res = await fetch(API + "/student/upload-resume", {
+            method: "POST",
+            headers: { "Authorization": "Bearer " + token },
+            body: formData
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Upload failed");
+        showMsg("Resume uploaded successfully!", "success");
+        updateResumeUI(data.filename);
+        document.getElementById("resumeInput").value = "";
+        document.getElementById("selectedFileLabel").textContent = "";
+    } catch (err) {
+        showMsg(err.message, "error");
+    } finally {
+        btn.disabled = false;
+        btn.textContent = "⬆️ Upload Resume";
+    }
+});
+
+document.getElementById("deleteResumeBtn").addEventListener("click", async () => {
+    if (!confirm("Are you sure you want to delete your resume?")) return;
+    try {
+        await apiDelete("/student/resume");
+        showMsg("Resume deleted.", "info");
+        updateResumeUI(null);
+    } catch (err) {
+        showMsg(err.message, "error");
+    }
+});
+
+// ==============================
+// NOTIFICATIONS
+// ==============================
+
+async function loadNotifications() {
+    const list  = document.getElementById("notificationsList");
+    const badge = document.getElementById("notifBadge");
+    list.innerHTML = '<div class="empty-state">Loading notifications...</div>';
+
+    try {
+        const data = data_ = await apiGet("/notifications");
+        const notifs = data.notifications || [];
+        const unread = data.unread_count  || 0;
+
+        if (unread > 0) {
+            badge.textContent = unread > 9 ? "9+" : unread;
+            badge.classList.remove("hidden");
+        } else {
+            badge.classList.add("hidden");
+        }
+
+        if (!notifs.length) {
+            list.innerHTML = '<div class="empty-state">No notifications yet.</div>';
+            return;
+        }
+
+        list.innerHTML = "";
+
+        notifs.forEach(n => {
+            const item = document.createElement("div");
+            item.className = "notif-item" + (n.is_read ? " read" : "");
+            item.innerHTML = `
+                <div class="dot"></div>
+                <div>
+                    <div class="notif-msg">${n.message}</div>
+                    <div class="notif-time">${fmtDate(n.created_at)}</div>
+                </div>
+            `;
+            if (!n.is_read) {
+                item.style.cursor = "pointer";
+                item.addEventListener("click", async () => {
+                    try {
+                        await apiPut("/notifications/" + n.notification_id + "/read", {});
+                        item.classList.add("read");
+                        item.querySelector(".dot").style.background = "#d1d5db";
+                        const newCount = Math.max(0, parseInt(badge.textContent || 0) - 1);
+                        badge.textContent = newCount;
+                        if (newCount === 0) badge.classList.add("hidden");
+                    } catch (e) {}
                 });
-                const data = await response.json();
-                if (!response.ok) {
-                    throw new Error(data.message || "Could not update your profile.");
-                }
-
-                await loadStudentProfile();
-                document.getElementById("editProfileForm").classList.remove("visible");
-                showMessage(data.message || "Profile updated successfully!", "success");
-            } catch (error) {
-                console.error("Profile update error:", error);
-                showMessage(error.message || "Unable to save your profile. Please try again.", "error");
-            } finally {
-                saveButton.disabled = false;
-                saveButton.textContent = originalButtonText;
             }
+            list.appendChild(item);
         });
 
-        function renderApplications(applications) {
-            applicationsList.replaceChildren();
+    } catch (err) {
+        list.innerHTML = `<div class="empty-state">${err.message}</div>`;
+    }
+}
 
-            applicationCount.textContent = String(applications.length);
+document.getElementById("refreshNotifBtn").addEventListener("click", loadNotifications);
 
-            if (applications.length === 0) {
-                applicationsList.appendChild(
-                    makeElement(
-                        "div",
-                        "empty-state",
-                        "You have not applied for any jobs yet. Explore jobs and internships to get started!"
-                    )
-                );
+document.getElementById("markAllReadBtn").addEventListener("click", async () => {
+    try {
+        await apiPut("/notifications/read-all", {});
+        showMsg("All notifications marked as read.", "success");
+        document.getElementById("notifBadge").classList.add("hidden");
+        loadNotifications();
+    } catch (err) {
+        showMsg(err.message, "error");
+    }
+});
 
-                return;
-            }
+// ==============================
+// OVERVIEW STATS
+// ==============================
 
-            applications.forEach(function (application) {
-                const card = makeElement("article", "application-card");
+async function loadOverviewStats() {
+    // Silently loads stats for the overview cards
+    try {
+        const [appData, savedData, recData] = await Promise.all([
+            apiGet("/applications/my-applications").catch(() => ({ applications: [] })),
+            apiGet("/student/saved-jobs").catch(() => ({ saved_jobs: [] })),
+            apiGet("/student/recommendations").catch(() => ({ recommendations: [] }))
+        ]);
 
-                const title = makeElement(
-                    "h3",
-                    "",
-                    application.title ||
-                    application.job_title ||
-                    "Job #" + formatValue(application.job_id)
-                );
+        const apps     = appData.applications  || [];
+        const saved    = savedData.saved_jobs  || [];
+        const recs     = recData.recommendations || [];
+        const selected = apps.filter(a => a.application_status === "Selected").length;
 
-                const company = makeElement(
-                    "p",
-                    "",
-                    "Company: " +
-                    formatValue(
-                        application.company_name || application.company
-                    )
-                );
+        myApplicationIds = new Set(apps.map(a => Number(a.job_id)));
 
-                const location = makeElement(
-                    "p",
-                    "",
-                    "Location: " + formatValue(application.location)
-                );
+        document.getElementById("statApplications").textContent = apps.length;
+        document.getElementById("statSaved").textContent        = saved.length;
+        document.getElementById("statRecommended").textContent  = recs.length;
+        document.getElementById("statSelected").textContent     = selected;
+    } catch (e) {}
+}
 
-                const appliedDate = makeElement(
-                    "p",
-                    "",
-                    "Applied on: " + formatDate(application.applied_at)
-                );
+// ==============================
+// LOGOUT
+// ==============================
 
-                const status = getStatus(application);
+document.getElementById("logoutButton").addEventListener("click", () => {
+    ["token", "role", "name", "email"].forEach(k => localStorage.removeItem(k));
+    window.location.replace("login.html");
+});
 
-                const statusRow = makeElement("p", "");
-                statusRow.appendChild(
-                    makeElement("strong", "", "Application status: ")
-                );
-                statusRow.appendChild(
-                    makeElement("span", getStatusClass(status), status)
-                );
+// ==============================
+// INITIAL LOAD
+// ==============================
 
-                card.appendChild(title);
-                card.appendChild(company);
-                card.appendChild(location);
-                card.appendChild(appliedDate);
-                card.appendChild(statusRow);
+async function initDashboard() {
+    await Promise.all([
+        loadProfile(),
+        loadOverviewStats(),
+        loadNotifications()
+    ]);
+    // Lazy-load other tabs when clicked
+    document.querySelector('[data-tab="recommendations"]').addEventListener("click", loadRecommendations, { once: true });
+    document.querySelector('[data-tab="saved"]').addEventListener("click", loadSavedJobs, { once: true });
+    document.querySelector('[data-tab="applications"]').addEventListener("click", loadApplications, { once: true });
+}
 
-                applicationsList.appendChild(card);
-            });
-        }
-
-        async function loadMyApplications() {
-            applicationsList.replaceChildren();
-
-            applicationsList.appendChild(
-                makeElement("div", "empty-state", "Loading applications...")
-            );
-
-            try {
-                const response = await fetch(
-                    API_BASE_URL + "/applications/my-applications",
-                    {
-                        method: "GET",
-                        headers: {
-                            "Authorization": "Bearer " + token
-                        }
-                    }
-                );
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(
-                        data.message || "Could not load applications."
-                    );
-                }
-
-                myApplications = getApplicationsArray(data);
-
-                renderApplications(myApplications);
-
-            } catch (error) {
-                console.error("Applications loading error:", error);
-
-                applicationCount.textContent = "—";
-
-                applicationsList.replaceChildren();
-
-                applicationsList.appendChild(
-                    makeElement(
-                        "div",
-                        "empty-state",
-                        "Unable to load applications. Check the backend server and GET /api/applications/my-applications."
-                    )
-                );
-            }
-        }
-
-        // Refresh the profile and application history.
-        document.getElementById("refreshApplicationsButton")
-            .addEventListener("click", async function () {
-                clearMessage();
-                await loadMyApplications();
-                showMessage("Application list refreshed.", "success");
-            });
-
-        document.getElementById("refreshProfileButton")
-            .addEventListener("click", async function () {
-                clearMessage();
-                await loadStudentProfile();
-                showMessage("Profile information refreshed.", "success");
-            });
-
-        // Logout and remove session-related local storage values.
-        document.getElementById("logoutButton")
-            .addEventListener("click", function () {
-                localStorage.removeItem("token");
-                localStorage.removeItem("role");
-                localStorage.removeItem("name");
-                localStorage.removeItem("email");
-
-                window.location.replace("login.html");
-            });
-
-        // Load dashboard information after verifying the session.
-        if (token && role === "student") {
-            loadStudentProfile();
-            loadMyApplications();
-        }
-    </script>
+initDashboard();
+</script>
 
 </body>
 </html>

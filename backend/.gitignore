@@ -1,0 +1,4 @@
+node_modules/
+.env
+routes/.env
+*.log
